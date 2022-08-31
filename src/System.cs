@@ -10,67 +10,63 @@ public interface ISystem
     void Run();
 }
 
-public abstract class EcsSystem : Object, ISystem
+public static class ISystemExtensions
 {
-    public World World { get; set; }
-
-    public abstract void Run();
-    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected EntityBuilder Spawn()
+    public static EntityBuilder Spawn(this ISystem system)
     {
-        return new EntityBuilder(World, World.Spawn().Identity);
+        return new EntityBuilder(system.World, system.World.Spawn().Identity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected EntityBuilder On(Entity entity)
+    public static EntityBuilder On(this ISystem system, Entity entity)
     {
-        return new EntityBuilder(World, entity.Identity);
+        return new EntityBuilder(system.World, entity.Identity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected void Despawn(Entity entity)
+    public static void Despawn(this ISystem system, Entity entity)
     {
-        World.Despawn(entity.Identity);
+        system.World.Despawn(entity.Identity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool IsAlive(Entity entity)
+    public static bool IsAlive(this ISystem system, Entity entity)
     {
-        return entity != null && World.IsAlive(entity.Identity);
+        return entity != null && system.World.IsAlive(entity.Identity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected T GetComponent<T>(Entity entity) where T : class
+    public static T GetComponent<T>(this ISystem system, Entity entity) where T : class
     {
-        return World.GetComponent<T>(entity.Identity);
+        return system.World.GetComponent<T>(entity.Identity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected T GetComponent<T>(Entity entity, Entity target) where T : class
+    public static T GetComponent<T>(this ISystem system, Entity entity, Entity target) where T : class
     {
-        return World.GetComponent<T>(entity.Identity, target.Identity);
+        return system.World.GetComponent<T>(entity.Identity, target.Identity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected T GetComponent<T>(Entity entity, Type type) where T : class
+    public static T GetComponent<T>(this ISystem system, Entity entity, Type type) where T : class
     {
-        var typeIdentity = World.GetTypeIdentity(type);
-        return World.GetComponent<T>(entity.Identity, typeIdentity);
+        var typeIdentity = system.World.GetTypeIdentity(type);
+        return system.World.GetComponent<T>(entity.Identity, typeIdentity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool TryGetComponent<T>(Entity entity, out T component) where T : class
+    public static bool TryGetComponent<T>(this ISystem system, Entity entity, out T component) where T : class
     {
-        return TryGetComponent(entity, Entity.None, out component);
+        return system.TryGetComponent(entity, Entity.None, out component);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool TryGetComponent<T>(Entity entity, Entity target, out T component) where T : class
+    public static bool TryGetComponent<T>(this ISystem system, Entity entity, Entity target, out T component) where T : class
     {
-        if (World.HasComponent<T>(entity.Identity, target.Identity))
+        if (system.World.HasComponent<T>(entity.Identity, target.Identity))
         {
-            component = World.GetComponent<T>(entity.Identity, target.Identity);
+            component = system.World.GetComponent<T>(entity.Identity, target.Identity);
             return true;
         }
 
@@ -79,12 +75,12 @@ public abstract class EcsSystem : Object, ISystem
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool TryGetComponent<T>(Entity entity, Type type, out T component) where T : class
+    public static bool TryGetComponent<T>(this ISystem system, Entity entity, Type type, out T component) where T : class
     {
-        var typeIdentity = World.GetTypeIdentity(type);
-        if (World.HasComponent<T>(entity.Identity, typeIdentity))
+        var typeIdentity = system.World.GetTypeIdentity(type);
+        if (system.World.HasComponent<T>(entity.Identity, typeIdentity))
         {
-            component = World.GetComponent<T>(entity.Identity, typeIdentity);
+            component = system.World.GetComponent<T>(entity.Identity, typeIdentity);
             return true;
         }
 
@@ -93,73 +89,73 @@ public abstract class EcsSystem : Object, ISystem
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool HasComponent<T>(Entity entity) where T : class
+    public static bool HasComponent<T>(this ISystem system, Entity entity) where T : class
     {
-        return World.HasComponent<T>(entity.Identity);
+        return system.World.HasComponent<T>(entity.Identity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool HasComponent<T>(Entity entity, Entity target) where T : class
+    public static bool HasComponent<T>(this ISystem system, Entity entity, Entity target) where T : class
     {
-        return World.HasComponent<T>(entity.Identity, target.Identity);
+        return system.World.HasComponent<T>(entity.Identity, target.Identity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool HasComponent<T>(Entity entity, Type type) where T : class
+    public static bool HasComponent<T>(this ISystem system, Entity entity, Type type) where T : class
     {
-        var typeIdentity = World.GetTypeIdentity(type);
-        return World.HasComponent<T>(entity.Identity, typeIdentity);
+        var typeIdentity = system.World.GetTypeIdentity(type);
+        return system.World.HasComponent<T>(entity.Identity, typeIdentity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Entity[] GetTargets<T>(Entity entity) where T : class
+    public static Entity[] GetTargets<T>(this ISystem system, Entity entity) where T : class
     {
-        return World.GetTargets<T>(entity.Identity);
+        return system.World.GetTargets<T>(entity.Identity);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected void Send<T>(T trigger) where T : class
+    public static void Send<T>(this ISystem system, T trigger) where T : class
     {
-        World.Send(trigger);
+        system.World.Send(trigger);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected TriggerQuery<T> Receive<T>() where T : class
+    public static TriggerQuery<T> Receive<T>(this ISystem system) where T : class
     {
-        return World.Receive<T>(this);
+        return system.World.Receive<T>(system);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected void AddElement<T>(T element) where T : class
+    public static void AddElement<T>(this ISystem system, T element) where T : class
     {
-        World.AddElement(element);
+        system.World.AddElement(element);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected void ReplaceElement<T>(T element) where T : class
+    public static void ReplaceElement<T>(this ISystem system, T element) where T : class
     {
-        World.ReplaceElement(element);
+        system.World.ReplaceElement(element);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected void AddOrReplaceElement<T>(T element) where T : class
+    public static void AddOrReplaceElement<T>(this ISystem system, T element) where T : class
     {
-        if (World.HasElement<T>()) World.ReplaceElement(element);
-        else World.AddElement(element);
+        if (system.World.HasElement<T>()) system.World.ReplaceElement(element);
+        else system.World.AddElement(element);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected T GetElement<T>() where T : class
+    public static T GetElement<T>(this ISystem system) where T : class
     {
-        return World.GetElement<T>();
+        return system.World.GetElement<T>();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool TryGetElement<T>(out T element) where T : class
+    public static bool TryGetElement<T>(this ISystem system, out T element) where T : class
     {
-        if (World.HasElement<T>())
+        if (system.World.HasElement<T>())
         {
-            element = World.GetElement<T>();
+            element = system.World.GetElement<T>();
             return true;
         }
 
@@ -168,89 +164,89 @@ public abstract class EcsSystem : Object, ISystem
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected bool HasElement<T>() where T : class
+    public static bool HasElement<T>(this ISystem system) where T : class
     {
-        return World.HasElement<T>();
+        return system.World.HasElement<T>();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected void RemoveElement<T>() where T : class
+    public static void RemoveElement<T>(this ISystem system) where T : class
     {
-        World.RemoveElement<T>();
+        system.World.RemoveElement<T>();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected void RemoveAll<T>() where T : class
+    public static void RemoveAll<T>(this ISystem system) where T : class
     {
-        foreach (var entity in QueryBuilder().Has<T>().Build())
+        foreach (var entity in QueryBuilder(system).Has<T>().Build())
         {
-            On(entity).Remove<T>();
+            system.On(entity).Remove<T>();
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected void DespawnAllWith<T>() where T : class
+    public static void DespawnAllWith<T>(this ISystem system) where T : class
     {
-        foreach (var entity in QueryBuilder().Has<T>().Build())
+        foreach (var entity in QueryBuilder(system).Has<T>().Build())
         {
-            Despawn(entity);
+            system.Despawn(entity);
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Query<Entity> Query()
+    public static Query<Entity> Query(this ISystem system)
     {
-        return new QueryBuilder<Entity>(World).Build();
+        return new QueryBuilder<Entity>(system.World).Build();
     }
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Query<C> Query<C>()
+    public static Query<C> Query<C>(this ISystem system)
         where C : class
     {
-        return new QueryBuilder<C>(World).Build();
+        return new QueryBuilder<C>(system.World).Build();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Query<C1, C2> Query<C1, C2>()
+    public static Query<C1, C2> Query<C1, C2>(this ISystem system)
         where C1 : class
         where C2 : class
     {
-        return new QueryBuilder<C1, C2>(World).Build();
+        return new QueryBuilder<C1, C2>(system.World).Build();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Query<C1, C2, C3> Query<C1, C2, C3>()
+    public static Query<C1, C2, C3> Query<C1, C2, C3>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
     {
-        return new QueryBuilder<C1, C2, C3>(World).Build();
+        return new QueryBuilder<C1, C2, C3>(system.World).Build();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Query<C1, C2, C3, C4> Query<C1, C2, C3, C4>()
+    public static Query<C1, C2, C3, C4> Query<C1, C2, C3, C4>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
         where C4 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4>(World).Build();
+        return new QueryBuilder<C1, C2, C3, C4>(system.World).Build();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Query<C1, C2, C3, C4, C5> Query<C1, C2, C3, C4, C5>()
+    public static Query<C1, C2, C3, C4, C5> Query<C1, C2, C3, C4, C5>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
         where C4 : class
         where C5 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4, C5>(World).Build();
+        return new QueryBuilder<C1, C2, C3, C4, C5>(system.World).Build();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Query<C1, C2, C3, C4, C5, C6> Query<C1, C2, C3, C4, C5, C6>()
+    public static Query<C1, C2, C3, C4, C5, C6> Query<C1, C2, C3, C4, C5, C6>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
@@ -258,11 +254,11 @@ public abstract class EcsSystem : Object, ISystem
         where C5 : class
         where C6 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4, C5, C6>(World).Build();
+        return new QueryBuilder<C1, C2, C3, C4, C5, C6>(system.World).Build();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Query<C1, C2, C3, C4, C5, C6, C7> Query<C1, C2, C3, C4, C5, C6, C7>()
+    public static Query<C1, C2, C3, C4, C5, C6, C7> Query<C1, C2, C3, C4, C5, C6, C7>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
@@ -271,11 +267,11 @@ public abstract class EcsSystem : Object, ISystem
         where C6 : class
         where C7 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7>(World).Build();
+        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7>(system.World).Build();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Query<C1, C2, C3, C4, C5, C6, C7, C8> Query<C1, C2, C3, C4, C5, C6, C7, C8>()
+    public static Query<C1, C2, C3, C4, C5, C6, C7, C8> Query<C1, C2, C3, C4, C5, C6, C7, C8>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
@@ -285,11 +281,11 @@ public abstract class EcsSystem : Object, ISystem
         where C7 : class
         where C8 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(World).Build();
+        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(system.World).Build();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected Query<C1, C2, C3, C4, C5, C6, C7, C8, C9> Query<C1, C2, C3, C4, C5, C6, C7, C8, C9>()
+    public static Query<C1, C2, C3, C4, C5, C6, C7, C8, C9> Query<C1, C2, C3, C4, C5, C6, C7, C8, C9>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
@@ -300,62 +296,62 @@ public abstract class EcsSystem : Object, ISystem
         where C8 : class
         where C9 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>(World).Build();
+        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>(system.World).Build();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected QueryBuilder<Entity> QueryBuilder()
+    public static QueryBuilder<Entity> QueryBuilder(this ISystem system)
     {
-        return new QueryBuilder<Entity>(World);
+        return new QueryBuilder<Entity>(system.World);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected QueryBuilder<C> QueryBuilder<C>()
+    public static QueryBuilder<C> QueryBuilder<C>(this ISystem system)
         where C : class
     {
-        return new QueryBuilder<C>(World);
+        return new QueryBuilder<C>(system.World);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected QueryBuilder<C1, C2> QueryBuilder<C1, C2>()
+    public static QueryBuilder<C1, C2> QueryBuilder<C1, C2>(this ISystem system)
         where C1 : class
         where C2 : class
     {
-        return new QueryBuilder<C1, C2>(World);
+        return new QueryBuilder<C1, C2>(system.World);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected QueryBuilder<C1, C2, C3> QueryBuilder<C1, C2, C3>()
+    public static QueryBuilder<C1, C2, C3> QueryBuilder<C1, C2, C3>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
     {
-        return new QueryBuilder<C1, C2, C3>(World);
+        return new QueryBuilder<C1, C2, C3>(system.World);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected QueryBuilder<C1, C2, C3, C4> QueryBuilder<C1, C2, C3, C4>()
+    public static QueryBuilder<C1, C2, C3, C4> QueryBuilder<C1, C2, C3, C4>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
         where C4 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4>(World);
+        return new QueryBuilder<C1, C2, C3, C4>(system.World);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected QueryBuilder<C1, C2, C3, C4, C5> QueryBuilder<C1, C2, C3, C4, C5>()
+    public static QueryBuilder<C1, C2, C3, C4, C5> QueryBuilder<C1, C2, C3, C4, C5>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
         where C4 : class
         where C5 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4, C5>(World);
+        return new QueryBuilder<C1, C2, C3, C4, C5>(system.World);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected QueryBuilder<C1, C2, C3, C4, C5, C6> QueryBuilder<C1, C2, C3, C4, C5, C6>()
+    public static QueryBuilder<C1, C2, C3, C4, C5, C6> QueryBuilder<C1, C2, C3, C4, C5, C6>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
@@ -363,11 +359,11 @@ public abstract class EcsSystem : Object, ISystem
         where C5 : class
         where C6 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4, C5, C6>(World);
+        return new QueryBuilder<C1, C2, C3, C4, C5, C6>(system.World);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected QueryBuilder<C1, C2, C3, C4, C5, C6, C7> QueryBuilder<C1, C2, C3, C4, C5, C6, C7>()
+    public static QueryBuilder<C1, C2, C3, C4, C5, C6, C7> QueryBuilder<C1, C2, C3, C4, C5, C6, C7>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
@@ -376,11 +372,11 @@ public abstract class EcsSystem : Object, ISystem
         where C6 : class
         where C7 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7>(World);
+        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7>(system.World);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>()
+    public static QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
@@ -390,11 +386,11 @@ public abstract class EcsSystem : Object, ISystem
         where C7 : class
         where C8 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(World);
+        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(system.World);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>()
+    public static QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>(this ISystem system)
         where C1 : class
         where C2 : class
         where C3 : class
@@ -405,7 +401,7 @@ public abstract class EcsSystem : Object, ISystem
         where C8 : class
         where C9 : class
     {
-        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>(World);
+        return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>(system.World);
     }
 }
 
