@@ -14,12 +14,14 @@ class Velocity { public int X, Y; }
 ```csharp
 // Systems add all the functionality to the Entity Component System.
 // Usually, you would run them from within your game loop.
-public class MoveSystem : ASystem
+public class MoveSystem : ISystem
 {
-    public override void Run()
+    public World World { get; set; }
+    
+    public void Run()
     {
         // iterate sets of components.
-        foreach(var (pos, vel) in Query<Position, Velocity>())
+        foreach(var (pos, vel) in this.Query<Position, Velocity>())
         {
             pos.X += vel.X;
             pos.Y += vel.Y;
@@ -31,30 +33,30 @@ public class MoveSystem : ASystem
 ### Spawning / Despawning Entities
 
 ```csharp
-public override void Run()
+public void Run()
 {
     // Spawn a new entity into the world and store the id for later use
-    Entity entity = Spawn().Id();
+    Entity entity = this.Spawn().Id();
     
     // Despawn an entity.
-    Despawn(entity);
+    this.Despawn(entity);
 }
 ```
 
 ### Adding / Removing Components
 
 ```csharp
-public override void Run()
+public void Run()
 {
     // Spawn an entity with components
-    Entity entity = Spawn()
+    Entity entity = this.Spawn()
         .Add<Position>()
         .Add(new Velocity { X = 5 })
         .Add<Tag>()
         .Id();
     
     // Change an Entities Components
-    On(entity).Add(new Name { Value = "Bob" }).Remove<Tag>();
+    this.On(entity).Add(new Name { Value = "Bob" }).Remove<Tag>();
 }
 ```
 
@@ -68,27 +70,27 @@ class Owes { public int Amount; }
 ```
 
 ```csharp
-public override void Run()
+public void Run()
 {
-    var bob = Spawn().Id();
-    var frank = Spawn().Id();
+    var bob = this.Spawn().Id();
+    var frank = this.Spawn().Id();
     
     // Relations consist of components, associated with a "target".
     // The target can either be another component, or an entity.
-    On(bob).Add<Likes>(typeof(Apples));
+    this.On(bob).Add<Likes>(typeof(Apples));
     //   Component     ^^^^^^^^^^^^^^
     
-    On(frank).Add(new Owes { Amount = 100 }, bob);
+    this.On(frank).Add(new Owes { Amount = 100 }, bob);
     //                                Entity ^^^
     
     // if you want to know if an entity has a component
-    bool doesBobHaveApples = HasComponent<Apples>(bob);
+    bool doesBobHaveApples = this.HasComponent<Apples>(bob);
     // if you want to know if an entity has a relation
-    bool doesBobLikeApples = HasComponent<Likes>(bob, typeof(Apples));
+    bool doesBobLikeApples = this.HasComponent<Likes>(bob, typeof(Apples));
     
     // Or get it directly.
     // In this case, we retrieve the amount that Frank owes Bob.
-    var owes = GetComponent<Owes>(frank, bob);
+    var owes = this.GetComponent<Owes>(frank, bob);
     Console.WriteLine($"Frank owes Bob {owes.Amount} dollars");
 }
 ```
@@ -96,11 +98,11 @@ public override void Run()
 ### Queries
 
 ```csharp
-public override void Run()
+public void Run()
 {
     // With queries, we can get a list of components that we can iterate through.
     // A simple query looks like this
-    var query = Query<Position, Velocity>();
+    var query = this.Query<Position, Velocity>();
     
     // Now we can loop through these components
     foreach(var (pos, vel) in query)
@@ -110,7 +112,7 @@ public override void Run()
             
     // You can create more complex, expressive queries through the QueryBuilder.
     // Here, we request every entity that has a Name component, owes money to Bob and does not have the Dead tag.
-    var appleLovers = QueryBuilder<Entity, Name>().Has<Owes>(bob).Not<Dead>().Build();
+    var appleLovers = this.QueryBuilder<Entity, Name>().Has<Owes>(bob).Not<Dead>().Build();
     
     // Note that we only get the components inside Query<>.
     // Has<T>, Not<T> and Any<T> only filter, but we don't actually get T int he loop.
@@ -130,15 +132,15 @@ class MyTrigger { }
 ```
 
 ```csharp
-public override void Run()
+public void Run()
 {
     // You can send a bunch of triggers inside of a system.
-    Send(new MyTrigger());
-    Send(new MyTrigger());
-    Send(new MyTrigger());
+    this.Send(new MyTrigger());
+    this.Send(new MyTrigger());
+    this.Send(new MyTrigger());
     
     // In any system, including the origin system, you can now receive these triggers.
-    foreach (var t in Receive<T>())
+    foreach (var t in this.Receive<T>())
     {
         Console.WriteLine("It's a trigger!");
     }
