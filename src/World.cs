@@ -118,7 +118,7 @@ namespace RelEcs
             var entity = Spawn();
             AddComponent(entity.Identity, new SystemList());
             AddComponent(entity.Identity, new LifeTime());
-            AddComponent(entity.Identity, new Trigger<T>(trigger));
+            AddComponent(entity.Identity, new Trigger<T> { Value = trigger });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

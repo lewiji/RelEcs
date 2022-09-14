@@ -48,9 +48,7 @@ namespace RelEcs
             static TypeIdAssigner()
             {
                 Id = ++Counter;
-                IsTag =
-                    typeof(T).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Length ==
-                    0;
+                IsTag = typeof(T).GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Length == 0;
             }
         }
     }

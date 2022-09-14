@@ -3,15 +3,9 @@ using System.Collections.Generic;
 
 namespace RelEcs
 {
-    public class Trigger<T>
+    internal class Trigger<T>
     {
-        public readonly T Value;
-
-        public Trigger()
-        {
-        }
-
-        public Trigger(T value) => Value = value;
+        internal T Value;
     }
 
     internal class SystemList
