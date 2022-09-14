@@ -150,27 +150,27 @@ namespace RelEcs
 
         public void AddElement<T>(T element) where T : class
         {
-            AddComponent(_world.Identity, new Element<T> { Value = element });
+            AddComponent(_world.Identity, element);
         }
 
         public T GetElement<T>() where T : class
         {
-            return GetComponent<Element<T>>(_world.Identity).Value;
+            return GetComponent<T>(_world.Identity);
         }
 
         public void ReplaceElement<T>(T element) where T : class
         {
-            GetComponent<Element<T>>(_world.Identity).Value = element;
+            GetComponent<T>(_world.Identity) = element;
         }
 
         public bool HasElement<T>() where T : class
         {
-            return HasComponent<Element<T>>(_world.Identity);
+            return HasComponent<T>(_world.Identity);
         }
 
         public void RemoveElement<T>() where T : class
         {
-            RemoveComponent<Element<T>>(_world.Identity);
+            RemoveComponent<T>(_world.Identity);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
