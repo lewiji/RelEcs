@@ -116,7 +116,13 @@ namespace RelEcs
             var typeIdentity = system.World.GetTypeIdentity(type);
             return system.World.HasComponent<T>(entity.Identity, typeIdentity);
         }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Entity GetTarget<T>(this ISystem system, Entity entity) where T : class
+        {
+            return system.World.GetTarget<T>(entity.Identity);
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Entity[] GetTargets<T>(this ISystem system, Entity entity) where T : class
         {

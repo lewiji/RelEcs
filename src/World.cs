@@ -401,7 +401,24 @@ namespace RelEcs
         {
             return _tables[tableId];
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal Entity GetTarget<T>(Identity identity) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
 
+            var meta = _entities[identity.Id];
+            var table = _tables[meta.TableId];
+
+            foreach (var storageType in table.Types)
+            {
+                if (!storageType.IsRelation || storageType.TypeId != type.TypeId) continue;
+                return new Entity(storageType.Identity);
+            }
+            
+            return Entity.None;
+        }
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Entity[] GetTargets<T>(Identity identity) where T : class
         {
