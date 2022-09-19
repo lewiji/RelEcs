@@ -92,8 +92,6 @@ namespace RelEcs
                 return;
             }
 
-            Lock();
-
             foreach (var type in list)
             {
                 var tablesWithType = _tablesByType[type];
@@ -106,8 +104,6 @@ namespace RelEcs
                     }
                 }
             }
-
-            Unlock();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -401,7 +397,7 @@ namespace RelEcs
         {
             return _tables[tableId];
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Entity GetTarget<T>(Identity identity) where T : class
         {
@@ -415,10 +411,10 @@ namespace RelEcs
                 if (!storageType.IsRelation || storageType.TypeId != type.TypeId) continue;
                 return new Entity(storageType.Identity);
             }
-            
+
             return Entity.None;
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Entity[] GetTargets<T>(Identity identity) where T : class
         {

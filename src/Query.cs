@@ -77,7 +77,7 @@ namespace RelEcs
 
         public TriggerEnumerator<C> GetEnumerator()
         {
-            return new TriggerEnumerator<C>(World, Tables, _systemType);
+            return new TriggerEnumerator<C>(Tables, _systemType);
         }
     }
 
@@ -536,14 +536,75 @@ namespace RelEcs
         }
     }
 
-    public class TriggerEnumerator<C> : Enumerator
+    public class TriggerEnumerator : IEnumerator, IDisposable
+    {
+        protected readonly List<Table> Tables;
+
+        protected int TableIndex;
+        protected int EntityIndex;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected TriggerEnumerator(List<Table> tables)
+        {
+            Tables = tables;
+            Reset();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool MoveNext()
+        {
+            if (TableIndex == Tables.Count) return false;
+
+            if (++EntityIndex < Tables[TableIndex].Count) return true;
+
+            EntityIndex = 0;
+            TableIndex++;
+
+            while (TableIndex < Tables.Count && Tables[TableIndex].Count == 0)
+            {
+                TableIndex++;
+            }
+
+            UpdateStorage();
+
+            return TableIndex < Tables.Count && EntityIndex < Tables[TableIndex].Count;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Reset()
+        {
+            TableIndex = 0;
+            EntityIndex = -1;
+
+            UpdateStorage();
+        }
+
+        object IEnumerator.Current
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => throw new Exception("Invalid Enumerator");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose()
+        {
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual void UpdateStorage()
+        {
+            throw new Exception("Invalid Enumerator");
+        }
+    }
+    
+    public class TriggerEnumerator<C> : TriggerEnumerator
     {
         Trigger<C>[] _storage;
         SystemList[] _systemLists;
         readonly Type _systemType;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TriggerEnumerator(World world, List<Table> tables, Type systemType) : base(world, tables)
+        public TriggerEnumerator(List<Table> tables, Type systemType) : base(tables)
         {
             _systemType = systemType;
         }
