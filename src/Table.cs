@@ -164,5 +164,15 @@ namespace RelEcs
 
             return newRow;
         }
+
+        public override string ToString()
+        {
+            var s = $"Table {Id} ";
+            foreach (var type in Types)
+            {
+                s += $"{type} ";
+            }
+            return s;
+        }
     }
 }

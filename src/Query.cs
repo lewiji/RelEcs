@@ -98,7 +98,8 @@ namespace RelEcs
         public C Get(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            var storage = (C[])Storages[Indices[meta.TableId]][0];
+            var index = Indices[meta.TableId];
+            var storage = (C[])Storages[index][0];
             return storage[meta.Row];
         }
 
