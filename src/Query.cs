@@ -12,8 +12,7 @@ namespace RelEcs
         internal readonly World World;
         internal readonly Mask Mask;
 
-        protected readonly List<Array[]> Storages = new();
-        protected readonly Dictionary<int, int> Indices = new();
+        protected readonly Dictionary<int, Array[]> Storages = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Query(World world, Mask mask, List<Table> tables)
@@ -29,7 +28,7 @@ namespace RelEcs
         public bool Has(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            return Indices.ContainsKey(meta.TableId);
+            return Storages.ContainsKey(meta.TableId);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -49,12 +48,11 @@ namespace RelEcs
         void UpdateStorages()
         {
             Storages.Clear();
-            Indices.Clear();
 
-            for (var i = 0; i < Tables.Count; i++)
+            foreach (var table in Tables)
             {
-                Indices.Add(Tables[i].Id, i);
-                Storages.Add(GetStorages(Tables[i]));
+                var storages = GetStorages(table);
+                Storages.Add(table.Id, storages);
             }
         }
     }
@@ -98,8 +96,7 @@ namespace RelEcs
         public C Get(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            var index = Indices[meta.TableId];
-            var storage = (C[])Storages[index][0];
+            var storage = (C[])Storages[meta.TableId][0];
             return storage[meta.Row];
         }
 
@@ -131,7 +128,7 @@ namespace RelEcs
         public (C1, C2) Get(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            var storages = Storages[Indices[meta.TableId]];
+            var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
             return (storage1[meta.Row], storage2[meta.Row]);
@@ -167,7 +164,7 @@ namespace RelEcs
         public (C1, C2, C3) Get(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            var storages = Storages[Indices[meta.TableId]];
+            var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
             var storage3 = (C3[])storages[2];
@@ -206,7 +203,7 @@ namespace RelEcs
         public (C1, C2, C3, C4) Get(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            var storages = Storages[Indices[meta.TableId]];
+            var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
             var storage3 = (C3[])storages[2];
@@ -248,7 +245,7 @@ namespace RelEcs
         public (C1, C2, C3, C4, C5) Get(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            var storages = Storages[Indices[meta.TableId]];
+            var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
             var storage3 = (C3[])storages[2];
@@ -293,7 +290,7 @@ namespace RelEcs
         public (C1, C2, C3, C4, C5, C6) Get(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            var storages = Storages[Indices[meta.TableId]];
+            var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
             var storage3 = (C3[])storages[2];
@@ -342,7 +339,7 @@ namespace RelEcs
         public (C1, C2, C3, C4, C5, C6, C7) Get(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            var storages = Storages[Indices[meta.TableId]];
+            var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
             var storage3 = (C3[])storages[2];
@@ -394,7 +391,7 @@ namespace RelEcs
         public (C1, C2, C3, C4, C5, C6, C7, C8) Get(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            var storages = Storages[Indices[meta.TableId]];
+            var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
             var storage3 = (C3[])storages[2];
@@ -449,7 +446,7 @@ namespace RelEcs
         public (C1, C2, C3, C4, C5, C6, C7, C8, C9) Get(Entity entity)
         {
             var meta = World.GetEntityMeta(entity.Identity);
-            var storages = Storages[Indices[meta.TableId]];
+            var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
             var storage3 = (C3[])storages[2];
