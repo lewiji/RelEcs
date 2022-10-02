@@ -128,6 +128,12 @@ namespace RelEcs
         {
             return system.World.GetTargets<T>(entity.Identity);
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static (StorageType, object)[] GetComponents(this ISystem system, Entity entity)
+        {
+            return system.World.GetComponents(entity.Identity);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Send<T>(this ISystem system, T trigger) where T : class

@@ -438,6 +438,32 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal (StorageType, object)[] GetComponents(Identity identity)
+        {
+            var meta = _entities[identity.Id];
+            var table = _tables[meta.TableId];
+
+            var list = ListPool<(StorageType, object)>.Get();
+
+            foreach (var type in table.Types)
+            {
+                if (type.IsTag)
+                {
+                    list.Add((type, null));
+                }
+                else
+                {
+                    var storage = table.GetStorage(type);
+                    list.Add((type, storage.GetValue(meta.Row)));
+                }
+            }
+
+            var array = list.ToArray();
+            ListPool<(StorageType, object)>.Add(list);
+            return array;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Identity GetTypeIdentity(Type type)
         {
             if (_typeIdentities.TryGetValue(type, out var identity)) return identity;
