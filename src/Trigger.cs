@@ -21,11 +21,9 @@ namespace RelEcs
 
     internal class TriggerLifeTimeSystem : ISystem
     {
-        public World World { get; set; }
-
-        public void Run()
+        public void Run(World world)
         {
-            var query = this.Query<Entity, SystemList, LifeTime>();
+            var query = world.Query<Entity, SystemList, LifeTime>();
             foreach (var (entity, systemList, lifeTime) in query)
             {
                 lifeTime.Value++;
@@ -33,7 +31,7 @@ namespace RelEcs
                 if (lifeTime.Value < 2) return;
 
                 ListPool<Type>.Add(systemList.List);
-                this.Despawn(entity);
+                world.Despawn(entity);
             }
         }
     }
