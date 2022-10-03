@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -10,100 +9,229 @@ namespace RelEcs
         static int worldCount;
 
         readonly Entity _world;
+        readonly WorldInfo _worldInfo;
 
-        EntityMeta[] _entities = new EntityMeta[512];
-
-        readonly Queue<Identity> _unusedIds = new();
-
-        readonly List<Table> _tables = new();
-
-        readonly Dictionary<int, Query> _queries = new();
-
-        int _entityCount;
+        readonly Entities _entities = new();
 
         internal readonly List<(Type, TimeSpan)> SystemExecutionTimes = new();
 
         readonly TriggerLifeTimeSystem _triggerLifeTimeSystem = new();
 
-        readonly List<TableOperation> _tableOperations = new();
+        public WorldInfo Info => _worldInfo;
 
-        readonly Dictionary<StorageType, List<Table>> _tablesByType = new();
-        readonly Dictionary<Identity, HashSet<StorageType>> _typesByRelationTarget = new();
-        readonly Dictionary<int, HashSet<StorageType>> _relationsByTypes = new();
-
-        readonly Dictionary<Type, Identity> _typeIdentities = new();
-
-        int _lockCount;
-        bool _isLocked;
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public World()
         {
-            AddTable(new SortedSet<StorageType> { StorageType.Create<Entity>(Identity.None) });
-
-            _world = Spawn();
-
-            AddElement(new WorldInfo(++worldCount));
+            _world = _entities.Spawn();
+            _worldInfo = new WorldInfo(++worldCount);
+            _entities.AddComponent(StorageType.Create<WorldInfo>(Identity.None), _world.Identity, _worldInfo);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Entity Spawn()
+        public EntityBuilder Spawn()
         {
-            var identity = _unusedIds.Count > 0 ? _unusedIds.Dequeue() : new Identity(++_entityCount);
-
-            var table = _tables[0];
-
-            var row = table.Add(identity);
-
-            if (_entities.Length == _entityCount) Array.Resize(ref _entities, _entityCount << 1);
-
-            _entities[identity.Id] = new EntityMeta(identity, table.Id, row);
-
-            var entity = new Entity(identity);
-
-            table.Storages[0].SetValue(entity, row);
-
-            return entity;
+            return new EntityBuilder(this, _entities.Spawn());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Despawn(Identity identity)
+        public EntityBuilder On(Entity entity)
         {
-            if (!IsAlive(identity)) return;
+            return new EntityBuilder(this, entity);
+        }
 
-            if (_isLocked)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Despawn(Entity entity)
+        {
+            _entities.Despawn(entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool IsAlive(Entity entity)
+        {
+            return _entities.IsAlive(entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T GetComponent<T>(Entity entity) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            return (T)_entities.GetComponent(type, entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryGetComponent<T>(Entity entity, out T component) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            if (!HasComponent<T>(entity))
             {
-                _tableOperations.Add(new TableOperation { Despawn = true, Identity = identity });
-                return;
+                component = null;
+                return false;
+            }
+            component = (T)_entities.GetComponent(type, entity.Identity);
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool HasComponent<T>(Entity entity) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            return _entities.HasComponent(type, entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddComponent<T>(Entity entity) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            if (!type.IsTag) throw new Exception();
+            _entities.AddComponent(type, entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddComponent<T>(Entity entity, T component) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            if (type.IsTag) throw new Exception();
+            _entities.AddComponent(type, entity.Identity, component);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveComponent<T>(Entity entity) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            _entities.RemoveComponent(type, entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<(StorageType, object)> GetComponents(Entity entity)
+        {
+            return _entities.GetComponents(entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T GetComponent<T>(Entity entity, Entity target) where T : class
+        {
+            var type = StorageType.Create<T>(target.Identity);
+            return (T)_entities.GetComponent(type, entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryGetComponent<T>(Entity entity, out T component, Entity target) where T : class
+        {
+            var type = StorageType.Create<T>(target.Identity);
+            if (!HasComponent<T>(entity))
+            {
+                component = null;
+                return false;
+            }
+            component = (T)_entities.GetComponent(type, entity.Identity);
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool HasComponent<T>(Entity entity, Entity target) where T : class
+        {
+            var type = StorageType.Create<T>(target.Identity);
+            return _entities.HasComponent(type, entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddComponent<T>(Entity entity, Entity target) where T : class
+        {
+            var type = StorageType.Create<T>(target.Identity);
+            if (!type.IsTag) throw new Exception();
+            _entities.AddComponent(type, entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddComponent<T>(Entity entity, T component, Entity target) where T : class
+        {
+            var type = StorageType.Create<T>(target.Identity);
+            if (type.IsTag) throw new Exception();
+            _entities.AddComponent(type, entity.Identity, component);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveComponent<T>(Entity entity, Entity target) where T : class
+        {
+            var type = StorageType.Create<T>(target.Identity);
+            _entities.RemoveComponent(type, entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Entity GetTarget<T>(Entity entity) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            return _entities.GetTarget(type, entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public IEnumerable<Entity> GetTargets<T>(Entity entity) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            return _entities.GetTargets(type, entity.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T GetElement<T>() where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            return (T)_entities.GetComponent(type, _world.Identity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryGetElement<T>(out T element) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            if (!HasElement<T>())
+            {
+                element = null;
+                return false;
             }
 
-            ref var meta = ref _entities[identity.Id];
+            element = (T)_entities.GetComponent(type, _world.Identity);
+            return true;
+        }
 
-            var table = _tables[meta.TableId];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool HasElement<T>() where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            return _entities.HasComponent(type, _world.Identity);
+        }
 
-            table.Remove(meta.Row);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddElement<T>(T element) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            if (type.IsTag) throw new Exception();
+            _entities.AddComponent(type, _world.Identity, element);
+        }
 
-            meta.Row = 0;
-            meta.Identity = Identity.None;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ReplaceElement<T>(T element) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            _entities.RemoveComponent(type, _world.Identity);
+            _entities.AddComponent(type, _world.Identity, element);
+        }
 
-            _unusedIds.Enqueue(identity);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void AddOrReplaceElement<T>(T element) where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
 
-            if (!_typesByRelationTarget.TryGetValue(identity, out var list))
+            if (_entities.HasComponent(type, _world.Identity))
             {
-                return;
+                _entities.RemoveComponent(type, _world.Identity);
             }
+            _entities.AddComponent(type, _world.Identity, element);
+        }
 
-            foreach (var type in list)
-            {
-                var tablesWithType = _tablesByType[type];
-
-                foreach (var tableWithType in tablesWithType)
-                {
-                    for (var i = 0; i < tableWithType.Count; i++)
-                    {
-                        RemoveComponent(type, tableWithType.Entities[i]);
-                    }
-                }
-            }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveElement<T>() where T : class
+        {
+            var type = StorageType.Create<T>(Identity.None);
+            _entities.RemoveComponent(type, _world.Identity);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -111,10 +239,11 @@ namespace RelEcs
         {
             if (trigger is null) throw new Exception("trigger cannot be null");
 
-            var entity = Spawn();
-            AddComponent(entity.Identity, new SystemList());
-            AddComponent(entity.Identity, new LifeTime());
-            AddComponent(entity.Identity, new Trigger<T> { Value = trigger });
+            var entity = _entities.Spawn();
+            _entities.AddComponent(StorageType.Create<SystemList>(Identity.None), entity.Identity, new SystemList());
+            _entities.AddComponent(StorageType.Create<LifeTime>(Identity.None), entity.Identity, new LifeTime());
+            _entities.AddComponent(StorageType.Create<Trigger<T>>(Identity.None), entity.Identity,
+                new Trigger<T> { Value = trigger });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -128,455 +257,186 @@ namespace RelEcs
             var matchingTables = new List<Table>();
 
             var type = mask.HasTypes[0];
-            if (!_tablesByType.TryGetValue(type, out var typeTables))
+            if (!_entities.TablesByType.TryGetValue(type, out var typeTables))
             {
                 typeTables = new List<Table>();
-                _tablesByType[type] = typeTables;
+                _entities.TablesByType[type] = typeTables;
             }
 
             foreach (var table in typeTables)
             {
-                if (!IsMaskCompatibleWith(mask, table)) continue;
+                if (!_entities.IsMaskCompatibleWith(mask, table)) continue;
 
                 matchingTables.Add(table);
             }
 
-            return new TriggerQuery<T>(this, mask, matchingTables, system.GetType());
+            return new TriggerQuery<T>(_entities, mask, matchingTables, system.GetType());
         }
 
-        public void AddElement<T>(T element) where T : class
+        public Query<Entity> Query()
         {
-            AddComponent(_world.Identity, element);
+            return new QueryBuilder<Entity>(_entities).Build();
         }
 
-        public T GetElement<T>() where T : class
+        public Query<C> Query<C>() where C : class
         {
-            return GetComponent<T>(_world.Identity);
+            return new QueryBuilder<C>(_entities).Build();
         }
 
-        public void ReplaceElement<T>(T element) where T : class
+        public Query<C1, C2> Query<C1, C2>() where C1 : class where C2 : class
         {
-            GetComponent<T>(_world.Identity) = element;
+            return new QueryBuilder<C1, C2>(_entities).Build();
         }
 
-        public bool HasElement<T>() where T : class
+        public Query<C1, C2, C3> Query<C1, C2, C3>() where C1 : class where C2 : class where C3 : class
         {
-            return HasComponent<T>(_world.Identity);
+            return new QueryBuilder<C1, C2, C3>(_entities).Build();
         }
 
-        public void RemoveElement<T>() where T : class
+        public Query<C1, C2, C3, C4> Query<C1, C2, C3, C4>()
+            where C1 : class where C2 : class where C3 : class where C4 : class
         {
-            RemoveComponent<T>(_world.Identity);
+            return new QueryBuilder<C1, C2, C3, C4>(_entities).Build();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(Identity identity, T data, Identity target = default) where T : class
+        public Query<C1, C2, C3, C4, C5> Query<C1, C2, C3, C4, C5>() where C1 : class
+            where C2 : class
+            where C3 : class
+            where C4 : class
+            where C5 : class
         {
-            var type = StorageType.Create<T>(target);
-            AddComponent(type, identity, type.IsTag ? null : data);
+            return new QueryBuilder<C1, C2, C3, C4, C5>(_entities).Build();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(Identity identity, Identity target = default) where T : class, new()
+        public Query<C1, C2, C3, C4, C5, C6> Query<C1, C2, C3, C4, C5, C6>() where C1 : class
+            where C2 : class
+            where C3 : class
+            where C4 : class
+            where C5 : class
+            where C6 : class
         {
-            var type = StorageType.Create<T>(target);
-            AddComponent(type, identity, type.IsTag ? null : new T());
+            return new QueryBuilder<C1, C2, C3, C4, C5, C6>(_entities).Build();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void AddComponent(StorageType type, Identity identity, object data = default)
+        public Query<C1, C2, C3, C4, C5, C6, C7> Query<C1, C2, C3, C4, C5, C6, C7>() where C1 : class
+            where C2 : class
+            where C3 : class
+            where C4 : class
+            where C5 : class
+            where C6 : class
+            where C7 : class
         {
-            ref var meta = ref _entities[identity.Id];
-            var oldTable = _tables[meta.TableId];
-
-            if (oldTable.Types.Contains(type))
-            {
-                throw new Exception($"Entity {identity} already has component of type {type}");
-            }
-
-            if (_isLocked)
-            {
-                _tableOperations.Add(new TableOperation { Add = true, Identity = identity, Type = type, Data = data });
-                return;
-            }
-
-            var oldEdge = oldTable.GetTableEdge(type);
-
-            var newTable = oldEdge.Add;
-
-            if (newTable == null)
-            {
-                var newTypes = oldTable.Types.ToList();
-                newTypes.Add(type);
-                newTable = AddTable(new SortedSet<StorageType>(newTypes));
-                oldEdge.Add = newTable;
-
-                var newEdge = newTable.GetTableEdge(type);
-                newEdge.Remove = oldTable;
-            }
-
-            var newRow = Table.MoveEntry(identity, meta.Row, oldTable, newTable);
-
-            meta.Row = newRow;
-            meta.TableId = newTable.Id;
-
-            if (type.IsTag) return;
-
-            var storage = newTable.GetStorage(type);
-            storage.SetValue(data, newRow);
+            return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7>(_entities).Build();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ref T GetComponent<T>(Identity identity, Identity target = default) where T : class
+        public Query<C1, C2, C3, C4, C5, C6, C7, C8> Query<C1, C2, C3, C4, C5, C6, C7, C8>() where C1 : class
+            where C2 : class
+            where C3 : class
+            where C4 : class
+            where C5 : class
+            where C6 : class
+            where C7 : class
+            where C8 : class
         {
-            var type = StorageType.Create<T>(target);
-
-            var meta = _entities[identity.Id];
-            var table = _tables[meta.TableId];
-            var storage = (T[])table.GetStorage(type); // return storages[indices[type]]
-            return ref storage[meta.Row];
+            return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(_entities).Build();
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool HasComponent<T>(Identity identity, Identity target = default) where T : class
+        public QueryBuilder<Entity> QueryBuilder()
         {
-            var meta = _entities[identity.Id];
-
-            if (meta.Identity == Identity.None) return false;
-
-            var type = StorageType.Create<T>(target);
-            return _tables[meta.TableId].Types.Contains(type);
+            return new QueryBuilder<Entity>(_entities);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemoveComponent<T>(Identity identity, Identity target = default) where T : class
+        public QueryBuilder<C> QueryBuilder<C>() where C : class
         {
-            var type = StorageType.Create<T>(target);
-            RemoveComponent(type, identity);
+            return new QueryBuilder<C>(_entities);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void RemoveComponent(StorageType type, Identity identity)
+        public QueryBuilder<C1, C2> QueryBuilder<C1, C2>() where C1 : class where C2 : class
         {
-            ref var meta = ref _entities[identity.Id];
-            var oldTable = _tables[meta.TableId];
-
-            if (!oldTable.Types.Contains(type))
-            {
-                throw new Exception($"cannot remove non-existent component {type.Type.Name} from entity {identity}");
-            }
-
-            if (_isLocked)
-            {
-                _tableOperations.Add(new TableOperation { Add = false, Identity = identity, Type = type });
-                return;
-            }
-
-            var oldEdge = oldTable.GetTableEdge(type);
-
-            var newTable = oldEdge.Remove;
-
-            if (newTable == null)
-            {
-                var newTypes = oldTable.Types.ToList();
-                newTypes.Remove(type);
-                newTable = AddTable(new SortedSet<StorageType>(newTypes));
-                oldEdge.Remove = newTable;
-
-                var newEdge = newTable.GetTableEdge(type);
-                newEdge.Add = oldTable;
-
-                _tables.Add(newTable);
-            }
-
-            var newRow = Table.MoveEntry(identity, meta.Row, oldTable, newTable);
-
-            meta.Row = newRow;
-            meta.TableId = newTable.Id;
+            return new QueryBuilder<C1, C2>(_entities);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Query GetQuery(Mask mask, Func<World, Mask, List<Table>, Query> createQuery)
+        public QueryBuilder<C1, C2, C3> QueryBuilder<C1, C2, C3>() where C1 : class where C2 : class where C3 : class
         {
-            var hash = mask.GetHashCode();
-
-            if (_queries.TryGetValue(hash, out var query)) return query;
-
-            var matchingTables = new List<Table>();
-
-            var type = mask.HasTypes[0];
-            if (!_tablesByType.TryGetValue(type, out var typeTables))
-            {
-                typeTables = new List<Table>();
-                _tablesByType[type] = typeTables;
-            }
-
-            foreach (var table in typeTables)
-            {
-                if (!IsMaskCompatibleWith(mask, table)) continue;
-
-                matchingTables.Add(table);
-            }
-
-            query = createQuery(this, mask, matchingTables);
-            _queries.Add(hash, query);
-
-            return query;
+            return new QueryBuilder<C1, C2, C3>(_entities);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        bool IsMaskCompatibleWith(Mask mask, Table table)
+        public QueryBuilder<C1, C2, C3, C4> QueryBuilder<C1, C2, C3, C4>() where C1 : class
+            where C2 : class
+            where C3 : class
+            where C4 : class
         {
-            var has = ListPool<StorageType>.Get();
-            var not = ListPool<StorageType>.Get();
-            var any = ListPool<StorageType>.Get();
-
-            var hasAnyTarget = ListPool<StorageType>.Get();
-            var notAnyTarget = ListPool<StorageType>.Get();
-            var anyAnyTarget = ListPool<StorageType>.Get();
-
-            foreach (var type in mask.HasTypes)
-            {
-                if (type.Identity == Identity.Any) hasAnyTarget.Add(type);
-                else has.Add(type);
-            }
-
-            foreach (var type in mask.NotTypes)
-            {
-                if (type.Identity == Identity.Any) notAnyTarget.Add(type);
-                else not.Add(type);
-            }
-
-            foreach (var type in mask.AnyTypes)
-            {
-                if (type.Identity == Identity.Any) anyAnyTarget.Add(type);
-                else any.Add(type);
-            }
-
-            var matchesComponents = table.Types.IsSupersetOf(has);
-            matchesComponents &= !table.Types.Overlaps(not);
-            matchesComponents &= mask.AnyTypes.Count == 0 || table.Types.Overlaps(any);
-
-            var matchesRelation = true;
-
-            foreach (var type in hasAnyTarget)
-            {
-                if (!_relationsByTypes.TryGetValue(type.TypeId, out var list))
-                {
-                    matchesRelation = false;
-                    continue;
-                }
-
-                matchesRelation &= table.Types.Overlaps(list);
-            }
-
-            ListPool<StorageType>.Add(has);
-            ListPool<StorageType>.Add(not);
-            ListPool<StorageType>.Add(any);
-            ListPool<StorageType>.Add(hasAnyTarget);
-            ListPool<StorageType>.Add(notAnyTarget);
-            ListPool<StorageType>.Add(anyAnyTarget);
-
-            return matchesComponents && matchesRelation;
+            return new QueryBuilder<C1, C2, C3, C4>(_entities);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool IsAlive(Identity identity)
+        public QueryBuilder<C1, C2, C3, C4, C5> QueryBuilder<C1, C2, C3, C4, C5>() where C1 : class
+            where C2 : class
+            where C3 : class
+            where C4 : class
+            where C5 : class
         {
-            return _entities[identity.Id].Identity != Identity.None;
+            return new QueryBuilder<C1, C2, C3, C4, C5>(_entities);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal ref EntityMeta GetEntityMeta(Identity identity)
+        public QueryBuilder<C1, C2, C3, C4, C5, C6> QueryBuilder<C1, C2, C3, C4, C5, C6>() where C1 : class
+            where C2 : class
+            where C3 : class
+            where C4 : class
+            where C5 : class
+            where C6 : class
         {
-            return ref _entities[identity.Id];
+            return new QueryBuilder<C1, C2, C3, C4, C5, C6>(_entities);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Table GetTable(int tableId)
+        public QueryBuilder<C1, C2, C3, C4, C5, C6, C7> QueryBuilder<C1, C2, C3, C4, C5, C6, C7>() where C1 : class
+            where C2 : class
+            where C3 : class
+            where C4 : class
+            where C5 : class
+            where C6 : class
+            where C7 : class
         {
-            return _tables[tableId];
+            return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7>(_entities);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Entity GetTarget<T>(Identity identity) where T : class
+        public QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>()
+            where C1 : class
+            where C2 : class
+            where C3 : class
+            where C4 : class
+            where C5 : class
+            where C6 : class
+            where C7 : class
+            where C8 : class
         {
-            var type = StorageType.Create<T>(Identity.None);
-
-            var meta = _entities[identity.Id];
-            var table = _tables[meta.TableId];
-
-            foreach (var storageType in table.Types)
-            {
-                if (!storageType.IsRelation || storageType.TypeId != type.TypeId) continue;
-                return new Entity(storageType.Identity);
-            }
-
-            return Entity.None;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Entity[] GetTargets<T>(Identity identity) where T : class
-        {
-            var type = StorageType.Create<T>(Identity.None);
-
-            var meta = _entities[identity.Id];
-            var table = _tables[meta.TableId];
-
-            var list = ListPool<Entity>.Get();
-
-            foreach (var storageType in table.Types)
-            {
-                if (!storageType.IsRelation || storageType.TypeId != type.TypeId) continue;
-                list.Add(new Entity(storageType.Identity));
-            }
-
-            var targetEntities = list.ToArray();
-            ListPool<Entity>.Add(list);
-
-            return targetEntities;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal (StorageType, object)[] GetComponents(Identity identity)
-        {
-            var meta = _entities[identity.Id];
-            var table = _tables[meta.TableId];
-
-            var list = ListPool<(StorageType, object)>.Get();
-
-            foreach (var type in table.Types)
-            {
-                if (type.IsTag)
-                {
-                    list.Add((type, null));
-                }
-                else
-                {
-                    var storage = table.GetStorage(type);
-                    list.Add((type, storage.GetValue(meta.Row)));
-                }
-            }
-
-            var array = list.ToArray();
-            ListPool<(StorageType, object)>.Add(list);
-            return array;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Identity GetTypeIdentity(Type type)
-        {
-            if (_typeIdentities.TryGetValue(type, out var identity)) return identity;
-
-            var entity = Spawn();
-            _typeIdentities.Add(type, entity.Identity);
-            return identity;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        Table AddTable(SortedSet<StorageType> types)
-        {
-            var table = new Table(_tables.Count, this, types);
-            _tables.Add(table);
-
-            foreach (var type in types)
-            {
-                if (!_tablesByType.TryGetValue(type, out var tableList))
-                {
-                    tableList = new List<Table>();
-                    _tablesByType[type] = tableList;
-                }
-
-                tableList.Add(table);
-
-                if (!type.IsRelation) continue;
-
-                if (!_typesByRelationTarget.TryGetValue(type.Identity, out var typeList))
-                {
-                    typeList = new HashSet<StorageType>();
-                    _typesByRelationTarget[type.Identity] = typeList;
-                }
-
-                typeList.Add(type);
-
-                if (!_relationsByTypes.TryGetValue(type.TypeId, out var relationTypeSet))
-                {
-                    relationTypeSet = new HashSet<StorageType>();
-                    _relationsByTypes[type.TypeId] = relationTypeSet;
-                }
-
-                relationTypeSet.Add(type);
-            }
-
-            foreach (var query in _queries.Values.Where(query => IsMaskCompatibleWith(query.Mask, table)))
-            {
-                query.AddTable(table);
-            }
-
-            return table;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ApplyTableOperations()
-        {
-            foreach (var op in _tableOperations)
-            {
-                if (!IsAlive(op.Identity)) continue;
-
-                if (op.Despawn) Despawn(op.Identity);
-                else if (op.Add) AddComponent(op.Type, op.Identity, op.Data);
-                else RemoveComponent(op.Type, op.Identity);
-            }
-
-            _tableOperations.Clear();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Lock()
-        {
-            _lockCount++;
-            _isLocked = true;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Unlock()
-        {
-            _lockCount--;
-            if (_lockCount != 0) return;
-            _isLocked = false;
-
-            ApplyTableOperations();
+            return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(_entities);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Tick()
         {
-            var info = GetElement<WorldInfo>();
-
-            info.EntityCount = _entityCount;
-            info.UnusedEntityCount = _unusedIds.Count;
-            info.AllocatedEntityCount = _entities.Length;
-            info.ArchetypeCount = _tables.Count;
+            _worldInfo.EntityCount = _entities.EntityCount;
+            _worldInfo.UnusedEntityCount = _entities.UnusedIds.Count;
+            _worldInfo.AllocatedEntityCount = _entities.Meta.Length;
+            _worldInfo.ArchetypeCount = _entities.Tables.Count;
             // info.RelationCount = relationCount;
-            info.ElementCount = _tables[_entities[_world.Identity.Id].TableId].Types.Count;
-            info.SystemCount = SystemExecutionTimes.Count;
-            info.CachedQueryCount = _queries.Count;
+            _worldInfo.ElementCount = _entities.Tables[_entities.Meta[_world.Identity.Id].TableId].Types.Count;
+            _worldInfo.CachedQueryCount = _entities.Queries.Count;
 
-            info.SystemExecutionTimes.Clear();
-            info.SystemExecutionTimes.AddRange(SystemExecutionTimes);
+            _worldInfo.SystemCount = SystemExecutionTimes.Count;
+
+            _worldInfo.SystemExecutionTimes.Clear();
+            _worldInfo.SystemExecutionTimes.AddRange(SystemExecutionTimes);
 
             _triggerLifeTimeSystem.Run(this);
 
             SystemExecutionTimes.Clear();
         }
 
-        struct TableOperation
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal Entity GetTypeEntity(Type type)
         {
-            public bool Despawn;
-            public bool Add;
-            public StorageType Type;
-            public Identity Identity;
-            public object Data;
+            return _entities.GetTypeEntity(type);
         }
     }
 

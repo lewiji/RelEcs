@@ -18,29 +18,29 @@ namespace RelEcs
 
         public readonly SortedSet<StorageType> Types;
 
-        public Identity[] Entities => _entities;
+        public Identity[] Identities => _identities;
         public Array[] Storages => _storages;
 
         public int Count { get; private set; }
         public bool IsEmpty => Count == 0;
 
-        readonly World _world;
+        readonly Entities _entities;
 
-        Identity[] _entities;
+        Identity[] _identities;
         readonly Array[] _storages;
 
         readonly Dictionary<StorageType, TableEdge> _edges = new();
         readonly Dictionary<StorageType, int> _indices = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Table(int id, World world, SortedSet<StorageType> types)
+        public Table(int id, Entities entities, SortedSet<StorageType> types)
         {
-            _world = world;
+            _entities = entities;
 
             Id = id;
             Types = types;
 
-            _entities = new Identity[StartCapacity];
+            _identities = new Identity[StartCapacity];
 
             var i = 0;
             foreach (var type in types)
@@ -61,7 +61,7 @@ namespace RelEcs
         public int Add(Identity identity)
         {
             EnsureCapacity(Count + 1);
-            _entities[Count] = identity;
+            _identities[Count] = identity;
             return Count++;
         }
 
@@ -75,17 +75,17 @@ namespace RelEcs
 
             if (row < Count)
             {
-                _entities[row] = _entities[Count];
+                _identities[row] = _identities[Count];
 
                 foreach (var storage in _storages)
                 {
                     Array.Copy(storage, Count, storage, row, 1);
                 }
 
-                _world.GetEntityMeta(_entities[row]).Row = row;
+                _entities.GetEntityMeta(_identities[row]).Row = row;
             }
 
-            _entities[Count] = default;
+            _identities[Count] = default;
 
             foreach (var storage in _storages)
             {
@@ -122,7 +122,7 @@ namespace RelEcs
         void EnsureCapacity(int capacity)
         {
             if (capacity <= 0) throw new ArgumentOutOfRangeException(nameof(capacity), "minCapacity must be positive");
-            if (capacity <= _entities.Length) return;
+            if (capacity <= _identities.Length) return;
 
             Resize(Math.Max(capacity, StartCapacity) << 1);
         }
@@ -134,7 +134,7 @@ namespace RelEcs
             if (length < Count)
                 throw new ArgumentOutOfRangeException(nameof(length), "length cannot be smaller than Count");
 
-            Array.Resize(ref _entities, length);
+            Array.Resize(ref _identities, length);
 
             for (var i = 0; i < _storages.Length; i++)
             {

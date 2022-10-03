@@ -1,8 +1,47 @@
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+
 namespace RelEcs
 {
     public interface ISystem
     {
-        World World { get; set; }
-        void Run();
+        void Run(World world);
+    }
+
+    public static class SystemExtensions
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Run(this ISystem system, World world)
+        {
+            var stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            system.Run(world);
+
+            stopWatch.Stop();
+            world.SystemExecutionTimes.Add((system.GetType(), stopWatch.Elapsed));
+        }
+    }
+
+    public sealed class SystemGroup
+    {
+        readonly List<ISystem> _systems = new();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public SystemGroup Add(ISystem aSystem)
+        {
+            _systems.Add(aSystem);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Run(World world)
+        {
+            foreach (var system in _systems)
+            {
+                system.Run(world);
+            }
+        }
     }
 }
