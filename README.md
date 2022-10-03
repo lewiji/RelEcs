@@ -48,7 +48,7 @@ public void Run(World world)
 {
     // Spawn an entity with components
     Entity entity = world.Spawn()
-        .Add<Position>()
+        .Add(new Position())
         .Add(new Velocity { X = 5 })
         .Add<Tag>()
         .Id();
