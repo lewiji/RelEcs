@@ -55,7 +55,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsAlive(Entity entity)
         {
-            return _entities.IsAlive(entity.Identity);
+            return entity is not null && _entities.IsAlive(entity.Identity);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
