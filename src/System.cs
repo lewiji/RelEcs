@@ -6,7 +6,8 @@ namespace RelEcs
 {
     public interface ISystem
     {
-        void Run(World world);
+        World World { get; set; }
+        void Run();
     }
 
     public static class SystemExtensions
@@ -17,7 +18,8 @@ namespace RelEcs
             var stopWatch = new Stopwatch();
             stopWatch.Start();
 
-            system.Run(world);
+            system.World = world;
+            system.Run();
 
             stopWatch.Stop();
             world.SystemExecutionTimes.Add((system.GetType(), stopWatch.Elapsed));

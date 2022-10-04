@@ -4,126 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace RelEcs
 {
-    public interface IWorld
-    {
-
-        WorldInfo Info { get; }
-
-        EntityBuilder Spawn();
-        EntityBuilder On(Entity entity);
-        void Despawn(Entity entity);
-        void DespawnAllWith<T>() where T : class;
-        bool IsAlive(Entity entity);
-
-        T GetComponent<T>(Entity entity) where T : class;
-        bool TryGetComponent<T>(Entity entity, out T component) where T : class;
-        bool HasComponent<T>(Entity entity) where T : class;
-        void AddComponent<T>(Entity entity) where T : class;
-        void AddComponent<T>(Entity entity, T component) where T : class;
-        void RemoveComponent<T>(Entity entity) where T : class;
-        IEnumerable<(StorageType, object)> GetComponents(Entity entity);
-
-        T GetComponent<T>(Entity entity, Entity target) where T : class;
-        bool TryGetComponent<T>(Entity entity, out T component, Entity target) where T : class;
-        bool HasComponent<T>(Entity entity, Entity target) where T : class;
-        void AddComponent<T>(Entity entity, Entity target) where T : class;
-        void AddComponent<T>(Entity entity, T component, Entity target) where T : class;
-        void RemoveComponent<T>(Entity entity, Entity target) where T : class;
-        Entity GetTarget<T>(Entity entity) where T : class;
-        IEnumerable<Entity> GetTargets<T>(Entity entity) where T : class;
-
-        T GetElement<T>() where T : class;
-        bool TryGetElement<T>(out T element) where T : class;
-        bool HasElement<T>() where T : class;
-        void AddElement<T>(T element) where T : class;
-        void ReplaceElement<T>(T element) where T : class;
-        void AddOrReplaceElement<T>(T element) where T : class;
-        void RemoveElement<T>() where T : class;
-
-        void Send<T>(T trigger) where T : class;
-        TriggerQuery<T> Receive<T>(ISystem system) where T : class;
-
-        Query<Entity> Query();
-        Query<C> Query<C>() where C : class;
-        Query<C1, C2> Query<C1, C2>() where C1 : class where C2 : class;
-        Query<C1, C2, C3> Query<C1, C2, C3>() where C1 : class where C2 : class where C3 : class;
-        Query<C1, C2, C3, C4> Query<C1, C2, C3, C4>()
-            where C1 : class where C2 : class where C3 : class where C4 : class;
-
-        Query<C1, C2, C3, C4, C5> Query<C1, C2, C3, C4, C5>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class;
-
-        Query<C1, C2, C3, C4, C5, C6> Query<C1, C2, C3, C4, C5, C6>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class
-            where C6 : class;
-
-        Query<C1, C2, C3, C4, C5, C6, C7> Query<C1, C2, C3, C4, C5, C6, C7>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class
-            where C6 : class
-            where C7 : class;
-
-        Query<C1, C2, C3, C4, C5, C6, C7, C8> Query<C1, C2, C3, C4, C5, C6, C7, C8>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class
-            where C6 : class
-            where C7 : class
-            where C8 : class;
-
-        QueryBuilder<Entity> QueryBuilder();
-        QueryBuilder<C> QueryBuilder<C>() where C : class;
-        QueryBuilder<C1, C2> QueryBuilder<C1, C2>() where C1 : class where C2 : class;
-        QueryBuilder<C1, C2, C3> QueryBuilder<C1, C2, C3>() where C1 : class where C2 : class where C3 : class;
-        QueryBuilder<C1, C2, C3, C4> QueryBuilder<C1, C2, C3, C4>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class;
-
-        QueryBuilder<C1, C2, C3, C4, C5> QueryBuilder<C1, C2, C3, C4, C5>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class;
-
-        QueryBuilder<C1, C2, C3, C4, C5, C6> QueryBuilder<C1, C2, C3, C4, C5, C6>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class
-            where C6 : class;
-
-        QueryBuilder<C1, C2, C3, C4, C5, C6, C7> QueryBuilder<C1, C2, C3, C4, C5, C6, C7>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class
-            where C6 : class
-            where C7 : class;
-
-        QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>()
-            where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class
-            where C6 : class
-            where C7 : class
-            where C8 : class;
-
-        void Tick();
-    }
-
-    public sealed class World : IWorld
+    public sealed class World
     {
         static int worldCount;
 
@@ -193,6 +74,7 @@ namespace RelEcs
                 component = null;
                 return false;
             }
+
             component = (T)_archetypes.GetComponent(type, entity.Identity);
             return true;
         }
@@ -208,7 +90,7 @@ namespace RelEcs
         public void AddComponent<T>(Entity entity) where T : class
         {
             var type = StorageType.Create<T>(Identity.None);
-            if (!type.IsTag) throw new Exception();
+            if (!type.IsTag) throw new Exception($"{type} is tag component, use Add(new Component()) instead");
             _archetypes.AddComponent(type, entity.Identity);
         }
 
@@ -216,7 +98,7 @@ namespace RelEcs
         public void AddComponent<T>(Entity entity, T component) where T : class
         {
             var type = StorageType.Create<T>(Identity.None);
-            if (type.IsTag) throw new Exception();
+            if (type.IsTag) throw new Exception($"{type} is tag component, Add<T>() instead");
             _archetypes.AddComponent(type, entity.Identity, component);
         }
 
@@ -249,6 +131,7 @@ namespace RelEcs
                 component = null;
                 return false;
             }
+
             component = (T)_archetypes.GetComponent(type, entity.Identity);
             return true;
         }
@@ -350,6 +233,7 @@ namespace RelEcs
             {
                 _archetypes.RemoveComponent(type, _world.Identity);
             }
+
             _archetypes.AddComponent(type, _world.Identity, element);
         }
 
