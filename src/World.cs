@@ -46,9 +46,16 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DespawnAllWith<T>() where T : class
+        {
+            var query = QueryBuilder<Entity>().Has<T>().Build();
+            foreach (var entity in query) Despawn(entity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsAlive(Entity entity)
         {
-            return _archetypes.IsAlive(entity.Identity);
+            return entity is not null && _archetypes.IsAlive(entity.Identity);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
