@@ -24,7 +24,7 @@ namespace RelEcs
         public int Count { get; private set; }
         public bool IsEmpty => Count == 0;
 
-        readonly Entities _entities;
+        readonly Archetypes _archetypes;
 
         Identity[] _identities;
         readonly Array[] _storages;
@@ -33,9 +33,9 @@ namespace RelEcs
         readonly Dictionary<StorageType, int> _indices = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Table(int id, Entities entities, SortedSet<StorageType> types)
+        public Table(int id, Archetypes archetypes, SortedSet<StorageType> types)
         {
-            _entities = entities;
+            _archetypes = archetypes;
 
             Id = id;
             Types = types;
@@ -82,7 +82,7 @@ namespace RelEcs
                     Array.Copy(storage, Count, storage, row, 1);
                 }
 
-                _entities.GetEntityMeta(_identities[row]).Row = row;
+                _archetypes.GetEntityMeta(_identities[row]).Row = row;
             }
 
             _identities[Count] = default;

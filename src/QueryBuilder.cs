@@ -6,13 +6,13 @@ namespace RelEcs
 {
     public class QueryBuilder
     {
-        internal readonly Entities Entities;
+        internal readonly Archetypes Archetypes;
         protected readonly Mask Mask;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder(Entities entities)
+        public QueryBuilder(Archetypes archetypes)
         {
-            Entities = entities;
+            Archetypes = archetypes;
             Mask = new Mask();
         }
 
@@ -27,7 +27,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public QueryBuilder Has<T>(Type type)
         {
-            var entity = Entities.GetTypeEntity(type);
+            var entity = Archetypes.GetTypeEntity(type);
             var typeIndex = StorageType.Create<T>(entity.Identity);
             Mask.Has(typeIndex);
             return this;
@@ -44,7 +44,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public QueryBuilder Not<T>(Type type)
         {
-            var entity = Entities.GetTypeEntity(type);
+            var entity = Archetypes.GetTypeEntity(type);
             var typeIndex = StorageType.Create<T>(entity.Identity);
             Mask.Not(typeIndex);
             return this;
@@ -61,7 +61,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public QueryBuilder Any<T>(Type type)
         {
-            var entity = Entities.GetTypeEntity(type);
+            var entity = Archetypes.GetTypeEntity(type);
             var typeIndex = StorageType.Create<T>(entity.Identity);
             Mask.Any(typeIndex);
             return this;
@@ -71,11 +71,11 @@ namespace RelEcs
     public sealed class QueryBuilder<C> : QueryBuilder
         where C : class
     {
-        static readonly Func<Entities, Mask, List<Table>, Query> CreateQuery =
-            (entities, mask, matchingTables) => new Query<C>(entities, mask, matchingTables);
+        static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+            (archetypes, mask, matchingTables) => new Query<C>(archetypes, mask, matchingTables);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder(Entities entities) : base(entities)
+        public QueryBuilder(Archetypes archetypes) : base(archetypes)
         {
             Has<C>();
         }
@@ -119,7 +119,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Query<C> Build()
         {
-            return (Query<C>)Entities.GetQuery(Mask, CreateQuery);
+            return (Query<C>)Archetypes.GetQuery(Mask, CreateQuery);
         }
     }
 
@@ -127,11 +127,11 @@ namespace RelEcs
         where C1 : class
         where C2 : class
     {
-        static readonly Func<Entities, Mask, List<Table>, Query> CreateQuery =
-            (entities, mask, matchingTables) => new Query<C1, C2>(entities, mask, matchingTables);
+        static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+            (archetypes, mask, matchingTables) => new Query<C1, C2>(archetypes, mask, matchingTables);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder(Entities entities) : base(entities)
+        public QueryBuilder(Archetypes archetypes) : base(archetypes)
         {
             Has<C1>().Has<C2>();
         }
@@ -175,7 +175,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Query<C1, C2> Build()
         {
-            return (Query<C1, C2>)Entities.GetQuery(Mask, CreateQuery);
+            return (Query<C1, C2>)Archetypes.GetQuery(Mask, CreateQuery);
         }
     }
 
@@ -184,11 +184,11 @@ namespace RelEcs
         where C2 : class
         where C3 : class
     {
-        static readonly Func<Entities, Mask, List<Table>, Query> CreateQuery =
-            (entities, mask, matchingTables) => new Query<C1, C2, C3>(entities, mask, matchingTables);
+        static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+            (archetypes, mask, matchingTables) => new Query<C1, C2, C3>(archetypes, mask, matchingTables);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder(Entities entities) : base(entities)
+        public QueryBuilder(Archetypes archetypes) : base(archetypes)
         {
             Has<C1>().Has<C2>().Has<C3>();
         }
@@ -232,7 +232,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Query<C1, C2, C3> Build()
         {
-            return (Query<C1, C2, C3>)Entities.GetQuery(Mask, CreateQuery);
+            return (Query<C1, C2, C3>)Archetypes.GetQuery(Mask, CreateQuery);
         }
     }
 
@@ -242,11 +242,11 @@ namespace RelEcs
         where C3 : class
         where C4 : class
     {
-        static readonly Func<Entities, Mask, List<Table>, Query> CreateQuery =
-            (entities, mask, matchingTables) => new Query<C1, C2, C3, C4>(entities, mask, matchingTables);
+        static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+            (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4>(archetypes, mask, matchingTables);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder(Entities entities) : base(entities)
+        public QueryBuilder(Archetypes archetypes) : base(archetypes)
         {
             Has<C1>().Has<C2>().Has<C3>().Has<C4>();
         }
@@ -290,7 +290,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Query<C1, C2, C3, C4> Build()
         {
-            return (Query<C1, C2, C3, C4>)Entities.GetQuery(Mask, CreateQuery);
+            return (Query<C1, C2, C3, C4>)Archetypes.GetQuery(Mask, CreateQuery);
         }
     }
 
@@ -301,11 +301,11 @@ namespace RelEcs
         where C4 : class
         where C5 : class
     {
-        static readonly Func<Entities, Mask, List<Table>, Query> CreateQuery =
-            (entities, mask, matchingTables) => new Query<C1, C2, C3, C4, C5>(entities, mask, matchingTables);
+        static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+            (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5>(archetypes, mask, matchingTables);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder(Entities entities) : base(entities)
+        public QueryBuilder(Archetypes archetypes) : base(archetypes)
         {
             Has<C1>().Has<C2>().Has<C3>().Has<C4>().Has<C5>();
         }
@@ -349,7 +349,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Query<C1, C2, C3, C4, C5> Build()
         {
-            return (Query<C1, C2, C3, C4, C5>)Entities.GetQuery(Mask, CreateQuery);
+            return (Query<C1, C2, C3, C4, C5>)Archetypes.GetQuery(Mask, CreateQuery);
         }
     }
 
@@ -361,11 +361,11 @@ namespace RelEcs
         where C5 : class
         where C6 : class
     {
-        static readonly Func<Entities, Mask, List<Table>, Query> CreateQuery =
-            (entities, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6>(entities, mask, matchingTables);
+        static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+            (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6>(archetypes, mask, matchingTables);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder(Entities entities) : base(entities)
+        public QueryBuilder(Archetypes archetypes) : base(archetypes)
         {
             Has<C1>().Has<C2>().Has<C3>().Has<C4>().Has<C5>().Has<C6>();
         }
@@ -409,7 +409,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Query<C1, C2, C3, C4, C5, C6> Build()
         {
-            return (Query<C1, C2, C3, C4, C5, C6>)Entities.GetQuery(Mask, CreateQuery);
+            return (Query<C1, C2, C3, C4, C5, C6>)Archetypes.GetQuery(Mask, CreateQuery);
         }
     }
 
@@ -422,11 +422,11 @@ namespace RelEcs
         where C6 : class
         where C7 : class
     {
-        static readonly Func<Entities, Mask, List<Table>, Query> CreateQuery =
-            (entities, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6, C7>(entities, mask, matchingTables);
+        static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+            (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6, C7>(archetypes, mask, matchingTables);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder(Entities entities) : base(entities)
+        public QueryBuilder(Archetypes archetypes) : base(archetypes)
         {
             Has<C1>().Has<C2>().Has<C3>().Has<C4>().Has<C5>().Has<C6>().Has<C7>();
         }
@@ -470,7 +470,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Query<C1, C2, C3, C4, C5, C6, C7> Build()
         {
-            return (Query<C1, C2, C3, C4, C5, C6, C7>)Entities.GetQuery(Mask, CreateQuery);
+            return (Query<C1, C2, C3, C4, C5, C6, C7>)Archetypes.GetQuery(Mask, CreateQuery);
         }
     }
 
@@ -484,11 +484,11 @@ namespace RelEcs
         where C7 : class
         where C8 : class
     {
-        static readonly Func<Entities, Mask, List<Table>, Query> CreateQuery =
-            (entities, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6, C7, C8>(entities, mask, matchingTables);
+        static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+            (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6, C7, C8>(archetypes, mask, matchingTables);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder(Entities entities) : base(entities)
+        public QueryBuilder(Archetypes archetypes) : base(archetypes)
         {
             Has<C1>().Has<C2>().Has<C3>().Has<C4>().Has<C5>().Has<C6>().Has<C7>().Has<C8>();
         }
@@ -532,7 +532,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Query<C1, C2, C3, C4, C5, C6, C7, C8> Build()
         {
-            return (Query<C1, C2, C3, C4, C5, C6, C7, C8>)Entities.GetQuery(Mask, CreateQuery);
+            return (Query<C1, C2, C3, C4, C5, C6, C7, C8>)Archetypes.GetQuery(Mask, CreateQuery);
         }
     }
 
@@ -547,11 +547,11 @@ namespace RelEcs
         where C8 : class
         where C9 : class
     {
-        static readonly Func<Entities, Mask, List<Table>, Query> CreateQuery =
-            (entities, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6, C7, C8, C9>(entities, mask, matchingTables);
+        static readonly Func<Archetypes, Mask, List<Table>, Query> CreateQuery =
+            (archetypes, mask, matchingTables) => new Query<C1, C2, C3, C4, C5, C6, C7, C8, C9>(archetypes, mask, matchingTables);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder(Entities entities) : base(entities)
+        public QueryBuilder(Archetypes archetypes) : base(archetypes)
         {
             Has<C1>().Has<C2>().Has<C3>().Has<C4>().Has<C5>().Has<C6>().Has<C7>().Has<C8>().Has<C9>();
         }
@@ -595,7 +595,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Query<C1, C2, C3, C4, C5, C6, C7, C8, C9> Build()
         {
-            return (Query<C1, C2, C3, C4, C5, C6, C7, C8, C9>)Entities.GetQuery(Mask, CreateQuery);
+            return (Query<C1, C2, C3, C4, C5, C6, C7, C8, C9>)Archetypes.GetQuery(Mask, CreateQuery);
         }
     }
 }

@@ -9,16 +9,16 @@ namespace RelEcs
     {
         public readonly List<Table> Tables;
 
-        internal readonly Entities Entities;
+        internal readonly Archetypes Archetypes;
         internal readonly Mask Mask;
 
         protected readonly Dictionary<int, Array[]> Storages = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Query(Entities entities, Mask mask, List<Table> tables)
+        public Query(Archetypes archetypes, Mask mask, List<Table> tables)
         {
             Tables = tables;
-            Entities = entities;
+            Archetypes = archetypes;
             Mask = mask;
 
             UpdateStorages();
@@ -27,7 +27,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Has(Entity entity)
         {
-            var meta = Entities.GetEntityMeta(entity.Identity);
+            var meta = Archetypes.GetEntityMeta(entity.Identity);
             return Storages.ContainsKey(meta.TableId);
         }
 
@@ -62,7 +62,7 @@ namespace RelEcs
     {
         readonly Type _systemType;
 
-        public TriggerQuery(Entities entities, Mask mask, List<Table> tables, Type systemType) : base(entities, mask, tables)
+        public TriggerQuery(Archetypes archetypes, Mask mask, List<Table> tables, Type systemType) : base(archetypes, mask, tables)
         {
             _systemType = systemType;
         }
@@ -82,7 +82,7 @@ namespace RelEcs
     public class Query<C> : Query
         where C : class
     {
-        public Query(Entities entities, Mask mask, List<Table> tables) : base(entities, mask, tables)
+        public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
         {
         }
 
@@ -95,14 +95,14 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public C Get(Entity entity)
         {
-            var meta = Entities.GetEntityMeta(entity.Identity);
+            var meta = Archetypes.GetEntityMeta(entity.Identity);
             var storage = (C[])Storages[meta.TableId][0];
             return storage[meta.Row];
         }
 
         public Enumerator<C> GetEnumerator()
         {
-            return new Enumerator<C>(Entities, Tables);
+            return new Enumerator<C>(Archetypes, Tables);
         }
     }
 
@@ -110,7 +110,7 @@ namespace RelEcs
         where C1 : class
         where C2 : class
     {
-        public Query(Entities entities, Mask mask, List<Table> tables) : base(entities, mask, tables)
+        public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
         {
         }
 
@@ -127,7 +127,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (C1, C2) Get(Entity entity)
         {
-            var meta = Entities.GetEntityMeta(entity.Identity);
+            var meta = Archetypes.GetEntityMeta(entity.Identity);
             var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
@@ -136,7 +136,7 @@ namespace RelEcs
 
         public Enumerator<C1, C2> GetEnumerator()
         {
-            return new Enumerator<C1, C2>(Entities, Tables);
+            return new Enumerator<C1, C2>(Archetypes, Tables);
         }
     }
 
@@ -145,7 +145,7 @@ namespace RelEcs
         where C2 : class
         where C3 : class
     {
-        public Query(Entities entities, Mask mask, List<Table> tables) : base(entities, mask, tables)
+        public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
         {
         }
 
@@ -163,7 +163,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (C1, C2, C3) Get(Entity entity)
         {
-            var meta = Entities.GetEntityMeta(entity.Identity);
+            var meta = Archetypes.GetEntityMeta(entity.Identity);
             var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
@@ -173,7 +173,7 @@ namespace RelEcs
 
         public Enumerator<C1, C2, C3> GetEnumerator()
         {
-            return new Enumerator<C1, C2, C3>(Entities, Tables);
+            return new Enumerator<C1, C2, C3>(Archetypes, Tables);
         }
     }
 
@@ -183,7 +183,7 @@ namespace RelEcs
         where C3 : class
         where C4 : class
     {
-        public Query(Entities entities, Mask mask, List<Table> tables) : base(entities, mask, tables)
+        public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
         {
         }
 
@@ -202,7 +202,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (C1, C2, C3, C4) Get(Entity entity)
         {
-            var meta = Entities.GetEntityMeta(entity.Identity);
+            var meta = Archetypes.GetEntityMeta(entity.Identity);
             var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
@@ -213,7 +213,7 @@ namespace RelEcs
 
         public Enumerator<C1, C2, C3, C4> GetEnumerator()
         {
-            return new Enumerator<C1, C2, C3, C4>(Entities, Tables);
+            return new Enumerator<C1, C2, C3, C4>(Archetypes, Tables);
         }
     }
 
@@ -224,7 +224,7 @@ namespace RelEcs
         where C4 : class
         where C5 : class
     {
-        public Query(Entities entities, Mask mask, List<Table> tables) : base(entities, mask, tables)
+        public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
         {
         }
 
@@ -244,7 +244,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (C1, C2, C3, C4, C5) Get(Entity entity)
         {
-            var meta = Entities.GetEntityMeta(entity.Identity);
+            var meta = Archetypes.GetEntityMeta(entity.Identity);
             var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
@@ -256,7 +256,7 @@ namespace RelEcs
 
         public Enumerator<C1, C2, C3, C4, C5> GetEnumerator()
         {
-            return new Enumerator<C1, C2, C3, C4, C5>(Entities, Tables);
+            return new Enumerator<C1, C2, C3, C4, C5>(Archetypes, Tables);
         }
     }
 
@@ -268,7 +268,7 @@ namespace RelEcs
         where C5 : class
         where C6 : class
     {
-        public Query(Entities entities, Mask mask, List<Table> tables) : base(entities, mask, tables)
+        public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
         {
         }
 
@@ -289,7 +289,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (C1, C2, C3, C4, C5, C6) Get(Entity entity)
         {
-            var meta = Entities.GetEntityMeta(entity.Identity);
+            var meta = Archetypes.GetEntityMeta(entity.Identity);
             var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
@@ -303,7 +303,7 @@ namespace RelEcs
 
         public Enumerator<C1, C2, C3, C4, C5, C6> GetEnumerator()
         {
-            return new Enumerator<C1, C2, C3, C4, C5, C6>(Entities, Tables);
+            return new Enumerator<C1, C2, C3, C4, C5, C6>(Archetypes, Tables);
         }
     }
 
@@ -316,7 +316,7 @@ namespace RelEcs
         where C6 : class
         where C7 : class
     {
-        public Query(Entities entities, Mask mask, List<Table> tables) : base(entities, mask, tables)
+        public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
         {
         }
 
@@ -338,7 +338,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (C1, C2, C3, C4, C5, C6, C7) Get(Entity entity)
         {
-            var meta = Entities.GetEntityMeta(entity.Identity);
+            var meta = Archetypes.GetEntityMeta(entity.Identity);
             var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
@@ -353,7 +353,7 @@ namespace RelEcs
 
         public Enumerator<C1, C2, C3, C4, C5, C6, C7> GetEnumerator()
         {
-            return new Enumerator<C1, C2, C3, C4, C5, C6, C7>(Entities, Tables);
+            return new Enumerator<C1, C2, C3, C4, C5, C6, C7>(Archetypes, Tables);
         }
     }
 
@@ -367,7 +367,7 @@ namespace RelEcs
         where C7 : class
         where C8 : class
     {
-        public Query(Entities entities, Mask mask, List<Table> tables) : base(entities, mask, tables)
+        public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
         {
         }
 
@@ -390,7 +390,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (C1, C2, C3, C4, C5, C6, C7, C8) Get(Entity entity)
         {
-            var meta = Entities.GetEntityMeta(entity.Identity);
+            var meta = Archetypes.GetEntityMeta(entity.Identity);
             var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
@@ -406,7 +406,7 @@ namespace RelEcs
 
         public Enumerator<C1, C2, C3, C4, C5, C6, C7, C8> GetEnumerator()
         {
-            return new Enumerator<C1, C2, C3, C4, C5, C6, C7, C8>(Entities, Tables);
+            return new Enumerator<C1, C2, C3, C4, C5, C6, C7, C8>(Archetypes, Tables);
         }
     }
 
@@ -421,7 +421,7 @@ namespace RelEcs
         where C8 : class
         where C9 : class
     {
-        public Query(Entities entities, Mask mask, List<Table> tables) : base(entities, mask, tables)
+        public Query(Archetypes archetypes, Mask mask, List<Table> tables) : base(archetypes, mask, tables)
         {
         }
 
@@ -445,7 +445,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public (C1, C2, C3, C4, C5, C6, C7, C8, C9) Get(Entity entity)
         {
-            var meta = Entities.GetEntityMeta(entity.Identity);
+            var meta = Archetypes.GetEntityMeta(entity.Identity);
             var storages = Storages[meta.TableId];
             var storage1 = (C1[])storages[0];
             var storage2 = (C2[])storages[1];
@@ -462,7 +462,7 @@ namespace RelEcs
 
         public Enumerator<C1, C2, C3, C4, C5, C6, C7, C8, C9> GetEnumerator()
         {
-            return new Enumerator<C1, C2, C3, C4, C5, C6, C7, C8, C9>(Entities, Tables);
+            return new Enumerator<C1, C2, C3, C4, C5, C6, C7, C8, C9>(Archetypes, Tables);
         }
     }
 
@@ -473,15 +473,15 @@ namespace RelEcs
         protected int TableIndex;
         protected int EntityIndex;
 
-        readonly Entities _entities;
+        readonly Archetypes _archetypes;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected Enumerator(Entities entities, List<Table> tables)
+        protected Enumerator(Archetypes archetypes, List<Table> tables)
         {
-            _entities = entities;
+            _archetypes = archetypes;
             Tables = tables;
 
-            _entities.Lock();
+            _archetypes.Lock();
 
             Reset();
         }
@@ -524,7 +524,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            _entities.Unlock();
+            _archetypes.Unlock();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -658,7 +658,7 @@ namespace RelEcs
         C[] _storage;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Enumerator(Entities entities, List<Table> tables) : base(entities, tables)
+        public Enumerator(Archetypes archetypes, List<Table> tables) : base(archetypes, tables)
         {
         }
 
@@ -682,7 +682,7 @@ namespace RelEcs
         C2[] _storage2;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Enumerator(Entities entities, List<Table> tables) : base(entities, tables)
+        public Enumerator(Archetypes archetypes, List<Table> tables) : base(archetypes, tables)
         {
         }
 
@@ -708,7 +708,7 @@ namespace RelEcs
         C3[] _storage3;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Enumerator(Entities entities, List<Table> tables) : base(entities, tables)
+        public Enumerator(Archetypes archetypes, List<Table> tables) : base(archetypes, tables)
         {
         }
 
@@ -736,7 +736,7 @@ namespace RelEcs
         C4[] _storage4;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Enumerator(Entities entities, List<Table> tables) : base(entities, tables)
+        public Enumerator(Archetypes archetypes, List<Table> tables) : base(archetypes, tables)
         {
         }
 
@@ -766,7 +766,7 @@ namespace RelEcs
         C5[] _storage5;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Enumerator(Entities entities, List<Table> tables) : base(entities, tables)
+        public Enumerator(Archetypes archetypes, List<Table> tables) : base(archetypes, tables)
         {
         }
 
@@ -799,7 +799,7 @@ namespace RelEcs
         C6[] _storage6;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Enumerator(Entities entities, List<Table> tables) : base(entities, tables)
+        public Enumerator(Archetypes archetypes, List<Table> tables) : base(archetypes, tables)
         {
         }
 
@@ -834,7 +834,7 @@ namespace RelEcs
         C7[] _storage7;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Enumerator(Entities entities, List<Table> tables) : base(entities, tables)
+        public Enumerator(Archetypes archetypes, List<Table> tables) : base(archetypes, tables)
         {
         }
 
@@ -871,7 +871,7 @@ namespace RelEcs
         C8[] _storage8;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Enumerator(Entities entities, List<Table> tables) : base(entities, tables)
+        public Enumerator(Archetypes archetypes, List<Table> tables) : base(archetypes, tables)
         {
         }
 
@@ -910,7 +910,7 @@ namespace RelEcs
         C9[] _storage9;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Enumerator(Entities entities, List<Table> tables) : base(entities, tables)
+        public Enumerator(Archetypes archetypes, List<Table> tables) : base(archetypes, tables)
         {
         }
 

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace RelEcs
 {
-    public sealed class Entities
+    public sealed class Archetypes
     {
         internal EntityMeta[] Meta = new EntityMeta[512];
 
@@ -26,7 +26,7 @@ namespace RelEcs
         int _lockCount;
         bool _isLocked;
 
-        public Entities()
+        public Archetypes()
         {
             AddTable(new SortedSet<StorageType> { StorageType.Create<Entity>(Identity.None) });
         }
@@ -195,7 +195,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Query GetQuery(Mask mask, Func<Entities, Mask, List<Table>, Query> createQuery)
+        public Query GetQuery(Mask mask, Func<Archetypes, Mask, List<Table>, Query> createQuery)
         {
             var hash = mask.GetHashCode();
 
