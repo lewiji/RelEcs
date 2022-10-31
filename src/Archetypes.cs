@@ -199,7 +199,11 @@ namespace RelEcs
         {
             var hash = mask.GetHashCode();
 
-            if (Queries.TryGetValue(hash, out var query)) return query;
+            if (Queries.TryGetValue(hash, out var query))
+            {
+                MaskPool.Add(mask);
+                return query;
+            }
 
             var matchingTables = new List<Table>();
 

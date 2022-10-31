@@ -27,6 +27,13 @@ namespace RelEcs
             AnyTypes.Add(type);
         }
 
+        public void Clear()
+        {
+            HasTypes.Clear();
+            NotTypes.Clear();
+            AnyTypes.Clear();
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode()
         {

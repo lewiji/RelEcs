@@ -25,7 +25,7 @@ namespace RelEcs
 
         public void Run()
         {
-            var query = World.Query<Entity, SystemList, LifeTime>();
+            var query = World.Query<Entity, SystemList, LifeTime>().Build();
             foreach (var (entity, systemList, lifeTime) in query)
             {
                 lifeTime.Value++;

@@ -48,7 +48,7 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void DespawnAllWith<T>() where T : class
         {
-            var query = QueryBuilder<Entity>().Has<T>().Build();
+            var query = Query<Entity>().Has<T>().Build();
             foreach (var entity in query) Despawn(entity);
         }
 
@@ -283,95 +283,27 @@ namespace RelEcs
             return new TriggerQuery<T>(_archetypes, mask, matchingTables, system.GetType());
         }
 
-        public Query<Entity> Query()
-        {
-            return new QueryBuilder<Entity>(_archetypes).Build();
-        }
-
-        public Query<C> Query<C>() where C : class
-        {
-            return new QueryBuilder<C>(_archetypes).Build();
-        }
-
-        public Query<C1, C2> Query<C1, C2>() where C1 : class where C2 : class
-        {
-            return new QueryBuilder<C1, C2>(_archetypes).Build();
-        }
-
-        public Query<C1, C2, C3> Query<C1, C2, C3>() where C1 : class where C2 : class where C3 : class
-        {
-            return new QueryBuilder<C1, C2, C3>(_archetypes).Build();
-        }
-
-        public Query<C1, C2, C3, C4> Query<C1, C2, C3, C4>()
-            where C1 : class where C2 : class where C3 : class where C4 : class
-        {
-            return new QueryBuilder<C1, C2, C3, C4>(_archetypes).Build();
-        }
-
-        public Query<C1, C2, C3, C4, C5> Query<C1, C2, C3, C4, C5>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class
-        {
-            return new QueryBuilder<C1, C2, C3, C4, C5>(_archetypes).Build();
-        }
-
-        public Query<C1, C2, C3, C4, C5, C6> Query<C1, C2, C3, C4, C5, C6>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class
-            where C6 : class
-        {
-            return new QueryBuilder<C1, C2, C3, C4, C5, C6>(_archetypes).Build();
-        }
-
-        public Query<C1, C2, C3, C4, C5, C6, C7> Query<C1, C2, C3, C4, C5, C6, C7>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class
-            where C6 : class
-            where C7 : class
-        {
-            return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7>(_archetypes).Build();
-        }
-
-        public Query<C1, C2, C3, C4, C5, C6, C7, C8> Query<C1, C2, C3, C4, C5, C6, C7, C8>() where C1 : class
-            where C2 : class
-            where C3 : class
-            where C4 : class
-            where C5 : class
-            where C6 : class
-            where C7 : class
-            where C8 : class
-        {
-            return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>(_archetypes).Build();
-        }
-
-        public QueryBuilder<Entity> QueryBuilder()
+        public QueryBuilder<Entity> Query()
         {
             return new QueryBuilder<Entity>(_archetypes);
         }
 
-        public QueryBuilder<C> QueryBuilder<C>() where C : class
+        public QueryBuilder<C> Query<C>() where C : class
         {
             return new QueryBuilder<C>(_archetypes);
         }
 
-        public QueryBuilder<C1, C2> QueryBuilder<C1, C2>() where C1 : class where C2 : class
+        public QueryBuilder<C1, C2> Query<C1, C2>() where C1 : class where C2 : class
         {
             return new QueryBuilder<C1, C2>(_archetypes);
         }
 
-        public QueryBuilder<C1, C2, C3> QueryBuilder<C1, C2, C3>() where C1 : class where C2 : class where C3 : class
+        public QueryBuilder<C1, C2, C3> Query<C1, C2, C3>() where C1 : class where C2 : class where C3 : class
         {
             return new QueryBuilder<C1, C2, C3>(_archetypes);
         }
 
-        public QueryBuilder<C1, C2, C3, C4> QueryBuilder<C1, C2, C3, C4>() where C1 : class
+        public QueryBuilder<C1, C2, C3, C4> Query<C1, C2, C3, C4>() where C1 : class
             where C2 : class
             where C3 : class
             where C4 : class
@@ -379,7 +311,7 @@ namespace RelEcs
             return new QueryBuilder<C1, C2, C3, C4>(_archetypes);
         }
 
-        public QueryBuilder<C1, C2, C3, C4, C5> QueryBuilder<C1, C2, C3, C4, C5>() where C1 : class
+        public QueryBuilder<C1, C2, C3, C4, C5> Query<C1, C2, C3, C4, C5>() where C1 : class
             where C2 : class
             where C3 : class
             where C4 : class
@@ -388,7 +320,7 @@ namespace RelEcs
             return new QueryBuilder<C1, C2, C3, C4, C5>(_archetypes);
         }
 
-        public QueryBuilder<C1, C2, C3, C4, C5, C6> QueryBuilder<C1, C2, C3, C4, C5, C6>() where C1 : class
+        public QueryBuilder<C1, C2, C3, C4, C5, C6> Query<C1, C2, C3, C4, C5, C6>() where C1 : class
             where C2 : class
             where C3 : class
             where C4 : class
@@ -398,7 +330,7 @@ namespace RelEcs
             return new QueryBuilder<C1, C2, C3, C4, C5, C6>(_archetypes);
         }
 
-        public QueryBuilder<C1, C2, C3, C4, C5, C6, C7> QueryBuilder<C1, C2, C3, C4, C5, C6, C7>() where C1 : class
+        public QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Query<C1, C2, C3, C4, C5, C6, C7>() where C1 : class
             where C2 : class
             where C3 : class
             where C4 : class
@@ -409,7 +341,7 @@ namespace RelEcs
             return new QueryBuilder<C1, C2, C3, C4, C5, C6, C7>(_archetypes);
         }
 
-        public QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>()
+        public QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Query<C1, C2, C3, C4, C5, C6, C7, C8>()
             where C1 : class
             where C2 : class
             where C3 : class

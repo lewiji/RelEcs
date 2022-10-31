@@ -13,7 +13,7 @@ namespace RelEcs
         public QueryBuilder(Archetypes archetypes)
         {
             Archetypes = archetypes;
-            Mask = new Mask();
+            Mask = MaskPool.Get();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
