@@ -36,14 +36,6 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static StorageType Create(Type type, Identity identity)
-        {
-            var createMethod = typeof(StorageType).GetMethod("Create");
-            var genericCreateMethod = createMethod?.MakeGenericMethod(type);
-            return (StorageType)genericCreateMethod?.Invoke(null, new object[] { identity });
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int CompareTo(StorageType other)
         {
             return Value.CompareTo(other.Value);
@@ -53,6 +45,12 @@ namespace RelEcs
         public override bool Equals(object obj)
         {
             return (obj is StorageType other) && Value == other.Value;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(StorageType other)
+        {
+            return Value == other.Value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

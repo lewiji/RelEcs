@@ -148,10 +148,7 @@ namespace RelEcs
         public bool HasComponent(StorageType type, Identity identity)
         {
             var meta = Meta[identity.Id];
-
-            if (meta.Identity == Identity.None) return false;
-
-            return Tables[meta.TableId].Types.Contains(type);
+            return meta.Identity != Identity.None && Tables[meta.TableId].Types.Contains(type);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

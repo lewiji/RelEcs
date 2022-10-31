@@ -496,7 +496,7 @@ namespace RelEcs
             EntityIndex = 0;
             TableIndex++;
 
-            while (TableIndex < Tables.Count && Tables[TableIndex].Count == 0)
+            while (TableIndex < Tables.Count && Tables[TableIndex].IsEmpty)
             {
                 TableIndex++;
             }
@@ -558,7 +558,7 @@ namespace RelEcs
             EntityIndex = 0;
             TableIndex++;
 
-            while (TableIndex < Tables.Count && Tables[TableIndex].Count == 0)
+            while (TableIndex < Tables.Count && Tables[TableIndex].IsEmpty)
             {
                 TableIndex++;
             }
@@ -624,7 +624,7 @@ namespace RelEcs
             EntityIndex = 0;
             TableIndex++;
 
-            while (TableIndex < Tables.Count && Tables[TableIndex].Count == 0)
+            while (TableIndex < Tables.Count && Tables[TableIndex].IsEmpty)
             {
                 TableIndex++;
             }
