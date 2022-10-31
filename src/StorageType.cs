@@ -24,7 +24,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static StorageType Create<T>(Identity identity)
+        public static StorageType Create<T>(Identity identity = default)
         {
             return new StorageType()
             {

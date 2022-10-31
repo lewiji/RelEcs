@@ -250,19 +250,41 @@ namespace RelEcs
             if (trigger is null) throw new Exception("trigger cannot be null");
 
             var entity = _archetypes.Spawn();
-            _archetypes.AddComponent(StorageType.Create<SystemList>(Identity.None), entity.Identity, new SystemList());
-            _archetypes.AddComponent(StorageType.Create<LifeTime>(Identity.None), entity.Identity, new LifeTime());
-            _archetypes.AddComponent(StorageType.Create<Trigger<T>>(Identity.None), entity.Identity,
-                new Trigger<T> { Value = trigger });
+            _archetypes.AddComponent(StorageType.Create<SystemList>(), entity.Identity, new SystemList());
+            _archetypes.AddComponent(StorageType.Create<LifeTime>(), entity.Identity, new LifeTime());
+            _archetypes.AddComponent(StorageType.Create<Trigger<T>>(), entity.Identity, new Trigger<T> { Value = trigger });
         }
+        
+        // TODO: maybe move this into _archetypes
+        readonly Dictionary<Type, Dictionary<int, Query>> _triggerQueries = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TriggerQuery<T> Receive<T>(ISystem system) where T : class
         {
-            var mask = new Mask();
+            var mask = MaskPool.Get();
 
             mask.Has(StorageType.Create<Trigger<T>>(Identity.None));
-            mask.Has(StorageType.Create<SystemList>(Identity.None));
+
+            var hash = mask.GetHashCode();
+
+            if (!_triggerQueries.TryGetValue(system.GetType(), out var dict))
+            {
+                dict = new Dictionary<int, Query>();
+                _triggerQueries.Add(system.GetType(), dict);
+            }
+
+            if (dict.TryGetValue(hash, out var query))
+            {
+                MaskPool.Add(mask);
+                return (TriggerQuery<T>)query;
+            }
+            
+            // TODO: This is kind of hacky. Figure out a better way to make sure trigger queries have the right tables
+            var dummy = _archetypes.Spawn();
+            _archetypes.AddComponent(StorageType.Create<SystemList>(), dummy.Identity, new SystemList());
+            _archetypes.AddComponent(StorageType.Create<LifeTime>(), dummy.Identity, new LifeTime());
+            _archetypes.AddComponent(StorageType.Create<Trigger<T>>(), dummy.Identity, new Trigger<T> { Value = default });
+            _archetypes.Despawn(dummy.Identity);
 
             var matchingTables = new List<Table>();
 
@@ -280,7 +302,10 @@ namespace RelEcs
                 matchingTables.Add(table);
             }
 
-            return new TriggerQuery<T>(_archetypes, mask, matchingTables, system.GetType());
+            query = new TriggerQuery<T>(_archetypes, mask, matchingTables, system.GetType());
+            dict.Add(hash, query);
+
+            return (TriggerQuery<T>)query;
         }
 
         public QueryBuilder<Entity> Query()
