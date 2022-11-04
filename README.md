@@ -20,7 +20,7 @@ public class MoveSystem : ISystem
     public void Run()
     {
         // iterate sets of components.
-        foreach(var (pos, vel) in World.Query<Position, Velocity>())
+        foreach(var (pos, vel) in World.Query<Position, Velocity>().Build())
         {
             pos.X += vel.X;
             pos.Y += vel.Y;
