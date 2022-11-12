@@ -13,8 +13,6 @@ namespace RelEcs
 
         readonly Archetypes _archetypes = new();
 
-        internal readonly List<(Type, TimeSpan)> SystemExecutionTimes = new();
-
         readonly TriggerLifeTimeSystem _triggerLifeTimeSystem = new();
 
         public WorldInfo Info => _worldInfo;
@@ -385,14 +383,7 @@ namespace RelEcs
             _worldInfo.ElementCount = _archetypes.Tables[_archetypes.Meta[_world.Identity.Id].TableId].Types.Count;
             _worldInfo.CachedQueryCount = _archetypes.Queries.Count;
 
-            _worldInfo.SystemCount = SystemExecutionTimes.Count;
-
-            _worldInfo.SystemExecutionTimes.Clear();
-            _worldInfo.SystemExecutionTimes.AddRange(SystemExecutionTimes);
-
             _triggerLifeTimeSystem.Run(this);
-
-            SystemExecutionTimes.Clear();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -413,14 +404,11 @@ namespace RelEcs
 
         // public int RelationCount;
         public int ElementCount;
-        public int SystemCount;
-        public List<(Type, TimeSpan)> SystemExecutionTimes;
         public int CachedQueryCount;
 
         public WorldInfo(int id)
         {
             WorldId = id;
-            SystemExecutionTimes = new List<(Type, TimeSpan)>();
         }
     }
 }

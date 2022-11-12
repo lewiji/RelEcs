@@ -8,5 +8,6 @@
     <PackageLicenseUrl>https://github.com/Byteron/RelEcs/blob/main/LICENSE</PackageLicenseUrl>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>Nullable</WarningsAsErrors>
+    <PackageVersion>1.5.1</PackageVersion>
   </PropertyGroup>
 </Project>
