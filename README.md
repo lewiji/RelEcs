@@ -16,10 +16,11 @@ class Velocity { public int X, Y; }
 // Usually, you would run them from within your game loop.
 public class MoveSystem : ISystem
 {
-    public void Run(World world)
+    public World World { get; set; }
+    public void Run()
     {
         // iterate sets of components.
-        foreach(var (pos, vel) in world.Query<Position, Velocity>())
+        foreach(var (pos, vel) in World.Query<Position, Velocity>().Build())
         {
             pos.X += vel.X;
             pos.Y += vel.Y;
@@ -31,30 +32,30 @@ public class MoveSystem : ISystem
 ### Spawning / Despawning Entities
 
 ```csharp
-public void Run(World world)
+public void Run()
 {
     // Spawn a new entity into the world and store the id for later use
-    Entity entity = world.Spawn().Id();
+    Entity entity = World.Spawn().Id();
     
     // Despawn an entity.
-    world.Despawn(entity);
+    World.Despawn(entity);
 }
 ```
 
 ### Adding / Removing Components
 
 ```csharp
-public void Run(World world)
+public void Run()
 {
     // Spawn an entity with components
-    Entity entity = world.Spawn()
+    Entity entity = World.Spawn()
         .Add(new Position())
         .Add(new Velocity { X = 5 })
         .Add<Tag>()
         .Id();
     
     // Change an Entities Components
-    world.On(entity).Add(new Name { Value = "Bob" }).Remove<Tag>();
+    World.On(entity).Add(new Name { Value = "Bob" }).Remove<Tag>();
 }
 ```
 
@@ -68,27 +69,27 @@ class Owes { public int Amount; }
 ```
 
 ```csharp
-public void Run(World world)
+public void Run()
 {
-    var bob = world.Spawn().Id();
-    var frank = world.Spawn().Id();
+    var bob = World.Spawn().Id();
+    var frank = World.Spawn().Id();
     
     // Relations consist of components, associated with a "target".
     // The target can either be another component, or an entity.
-    world.On(bob).Add<Likes>(typeof(Apples));
+    World.On(bob).Add<Likes>(typeof(Apples));
     //   Component     ^^^^^^^^^^^^^^
     
-    world.On(frank).Add(new Owes { Amount = 100 }, bob);
+    World.On(frank).Add(new Owes { Amount = 100 }, bob);
     //                                Entity ^^^
     
     // if you want to know if an entity has a component
-    bool doesBobHaveApples = world.HasComponent<Apples>(bob);
+    bool doesBobHaveApples = World.HasComponent<Apples>(bob);
     // if you want to know if an entity has a relation
-    bool doesBobLikeApples = world.HasComponent<Likes>(bob, typeof(Apples));
+    bool doesBobLikeApples = World.HasComponent<Likes>(bob, typeof(Apples));
     
     // Or get it directly.
     // In this case, we retrieve the amount that Frank owes Bob.
-    var owes = this.GetComponent<Owes>(frank, bob);
+    var owes = World.GetComponent<Owes>(frank, bob);
     Console.WriteLine($"Frank owes Bob {owes.Amount} dollars");
 }
 ```
@@ -96,11 +97,11 @@ public void Run(World world)
 ### Queries
 
 ```csharp
-public void Run(World world)
+public void Run()
 {
     // With queries, we can get a list of components that we can iterate through.
     // A simple query looks like this
-    var query = world.Query<Position, Velocity>();
+    var query = World.Query<Position, Velocity>().Build();
     
     // Now we can loop through these components
     foreach(var (pos, vel) in query)
@@ -108,9 +109,9 @@ public void Run(World world)
         pos.Value += vel.Value;
     }
             
-    // You can create more complex, expressive queries through the QueryBuilder.
+    // You can create more complex, expressive queries with additional method chaining.
     // Here, we request every entity that has a Name component, owes money to Bob and does not have the Dead tag.
-    var appleLovers = world.QueryBuilder<Entity, Name>().Has<Owes>(bob).Not<Dead>().Build();
+    var appleLovers = world.Query<Entity, Name>().Has<Owes>(bob).Not<Dead>().Build();
     
     // Note that we only get the components inside Query<>.
     // Has<T>, Not<T> and Any<T> only filter, but we don't actually get T int he loop.
@@ -130,15 +131,15 @@ class MyTrigger { }
 ```
 
 ```csharp
-public void Run(World world)
+public void Run()
 {
     // You can send a bunch of triggers inside of a system.
-    world.Send(new MyTrigger());
-    world.Send(new MyTrigger());
-    world.Send(new MyTrigger());
+    World.Send(new MyTrigger());
+    World.Send(new MyTrigger());
+    World.Send(new MyTrigger());
     
     // In any system, including the origin system, you can now receive these triggers.
-    foreach (var t in world.Receive<T>())
+    foreach (var t in World.Receive<T>(this))
     {
         Console.WriteLine("It's a trigger!");
     }
