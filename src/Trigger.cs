@@ -5,7 +5,7 @@ namespace RelEcs
 {
     internal class Trigger<T>
     {
-        internal T Value;
+        internal T Value = default!;
     }
 
     internal class SystemList
@@ -21,7 +21,7 @@ namespace RelEcs
 
     internal class TriggerLifeTimeSystem : ISystem
     {
-        public World World { get; set; }
+        public World World { get; set; } = default!;
 
         public void Run()
         {

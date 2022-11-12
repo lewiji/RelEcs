@@ -53,7 +53,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsAlive(Entity entity)
+        public bool IsAlive(Entity? entity)
         {
             return entity is not null && _archetypes.IsAlive(entity.Identity);
         }
@@ -66,7 +66,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetComponent<T>(Entity entity, out T component) where T : class
+        public bool TryGetComponent<T>(Entity entity, out T? component) where T : class
         {
             var type = StorageType.Create<T>(Identity.None);
             if (!HasComponent<T>(entity))
@@ -87,18 +87,16 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(Entity entity) where T : class
+        public void AddComponent<T>(Entity entity) where T : class, new()
         {
             var type = StorageType.Create<T>(Identity.None);
-            if (!type.IsTag) throw new Exception($"{type} is tag component, use Add(new Component()) instead");
-            _archetypes.AddComponent(type, entity.Identity);
+            _archetypes.AddComponent(type, entity.Identity, new T());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddComponent<T>(Entity entity, T component) where T : class
         {
             var type = StorageType.Create<T>(Identity.None);
-            if (type.IsTag) throw new Exception($"{type} is tag component, Add<T>() instead");
             _archetypes.AddComponent(type, entity.Identity, component);
         }
 
@@ -110,7 +108,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerable<(StorageType, object)> GetComponents(Entity entity)
+        public IEnumerable<(StorageType, object?)> GetComponents(Entity entity)
         {
             return _archetypes.GetComponents(entity.Identity);
         }
@@ -123,7 +121,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetComponent<T>(Entity entity, out T component, Entity target) where T : class
+        public bool TryGetComponent<T>(Entity entity, out T? component, Entity target) where T : class
         {
             var type = StorageType.Create<T>(target.Identity);
             if (!HasComponent<T>(entity))
@@ -144,18 +142,16 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent<T>(Entity entity, Entity target) where T : class
+        public void AddComponent<T>(Entity entity, Entity target) where T : class, new()
         {
             var type = StorageType.Create<T>(target.Identity);
-            if (!type.IsTag) throw new Exception();
-            _archetypes.AddComponent(type, entity.Identity);
+            _archetypes.AddComponent(type, entity.Identity, new T());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddComponent<T>(Entity entity, T component, Entity target) where T : class
         {
             var type = StorageType.Create<T>(target.Identity);
-            if (type.IsTag) throw new Exception();
             _archetypes.AddComponent(type, entity.Identity, component);
         }
 
@@ -188,7 +184,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetElement<T>(out T element) where T : class
+        public bool TryGetElement<T>(out T? element) where T : class
         {
             var type = StorageType.Create<T>(Identity.None);
             if (!HasElement<T>())
@@ -212,7 +208,6 @@ namespace RelEcs
         public void AddElement<T>(T element) where T : class
         {
             var type = StorageType.Create<T>(Identity.None);
-            if (type.IsTag) throw new Exception();
             _archetypes.AddComponent(type, _world.Identity, element);
         }
 
@@ -283,7 +278,7 @@ namespace RelEcs
             var dummy = _archetypes.Spawn();
             _archetypes.AddComponent(StorageType.Create<SystemList>(), dummy.Identity, new SystemList());
             _archetypes.AddComponent(StorageType.Create<LifeTime>(), dummy.Identity, new LifeTime());
-            _archetypes.AddComponent(StorageType.Create<Trigger<T>>(), dummy.Identity, new Trigger<T> { Value = default });
+            _archetypes.AddComponent(StorageType.Create<Trigger<T>>(), dummy.Identity, new Trigger<T> { Value = default! });
             _archetypes.Despawn(dummy.Identity);
 
             var matchingTables = new List<Table>();

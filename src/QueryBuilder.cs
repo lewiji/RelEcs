@@ -17,7 +17,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder Has<T>(Entity target = default)
+        public QueryBuilder Has<T>(Entity? target = default)
         {
             var typeIndex = StorageType.Create<T>(target?.Identity ?? Identity.None);
             Mask.Has(typeIndex);
@@ -34,7 +34,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder Not<T>(Entity target = default)
+        public QueryBuilder Not<T>(Entity? target = default)
         {
             var typeIndex = StorageType.Create<T>(target?.Identity ?? Identity.None);
             Mask.Not(typeIndex);
@@ -51,7 +51,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QueryBuilder Any<T>(Entity target = default)
+        public QueryBuilder Any<T>(Entity? target = default)
         {
             var typeIndex = StorageType.Create<T>(target?.Identity ?? Identity.None);
             Mask.Any(typeIndex);
@@ -81,7 +81,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C> Has<T>(Entity target = default)
+        public new QueryBuilder<C> Has<T>(Entity? target = default)
         {
             return (QueryBuilder<C>)base.Has<T>(target);
         }
@@ -93,7 +93,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C> Not<T>(Entity target = default)
+        public new QueryBuilder<C> Not<T>(Entity? target = default)
         {
             return (QueryBuilder<C>)base.Not<T>(target);
         }
@@ -105,7 +105,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C> Any<T>(Entity target = default)
+        public new QueryBuilder<C> Any<T>(Entity? target = default)
         {
             return (QueryBuilder<C>)base.Any<T>(target);
         }
@@ -137,7 +137,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2> Has<T>(Entity target = default)
+        public new QueryBuilder<C1, C2> Has<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2>)base.Has<T>(target);
         }
@@ -149,7 +149,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2> Not<T>(Entity target = default)
+        public new QueryBuilder<C1, C2> Not<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2>)base.Not<T>(target);
         }
@@ -161,7 +161,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2> Any<T>(Entity target = default)
+        public new QueryBuilder<C1, C2> Any<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2>)base.Any<T>(target);
         }
@@ -194,7 +194,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3> Has<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3> Has<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3>)base.Has<T>(target);
         }
@@ -206,7 +206,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3> Not<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3> Not<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3>)base.Not<T>(target);
         }
@@ -218,7 +218,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3> Any<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3> Any<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3>)base.Any<T>(target);
         }
@@ -252,7 +252,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4> Has<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4> Has<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4>)base.Has<T>(target);
         }
@@ -264,7 +264,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4> Not<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4> Not<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4>)base.Not<T>(target);
         }
@@ -276,7 +276,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4> Any<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4> Any<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4>)base.Any<T>(target);
         }
@@ -311,7 +311,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5> Has<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5> Has<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5>)base.Has<T>(target);
         }
@@ -323,7 +323,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5> Not<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5> Not<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5>)base.Not<T>(target);
         }
@@ -335,7 +335,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5> Any<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5> Any<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5>)base.Any<T>(target);
         }
@@ -371,7 +371,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6> Has<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6> Has<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6>)base.Has<T>(target);
         }
@@ -383,7 +383,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6> Not<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6> Not<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6>)base.Not<T>(target);
         }
@@ -395,7 +395,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6> Any<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6> Any<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6>)base.Any<T>(target);
         }
@@ -432,7 +432,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Has<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Has<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7>)base.Has<T>(target);
         }
@@ -444,7 +444,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Not<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Not<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7>)base.Not<T>(target);
         }
@@ -456,7 +456,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Any<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7> Any<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7>)base.Any<T>(target);
         }
@@ -494,7 +494,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Has<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Has<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>)base.Has<T>(target);
         }
@@ -506,7 +506,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Not<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Not<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>)base.Not<T>(target);
         }
@@ -518,7 +518,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Any<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8> Any<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8>)base.Any<T>(target);
         }
@@ -557,7 +557,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Has<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Has<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>)base.Has<T>(target);
         }
@@ -569,7 +569,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Not<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Not<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>)base.Not<T>(target);
         }
@@ -581,7 +581,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Any<T>(Entity target = default)
+        public new QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9> Any<T>(Entity? target = default)
         {
             return (QueryBuilder<C1, C2, C3, C4, C5, C6, C7, C8, C9>)base.Any<T>(target);
         }

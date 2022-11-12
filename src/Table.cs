@@ -6,8 +6,8 @@ namespace RelEcs
 {
     public sealed class TableEdge
     {
-        public Table Add;
-        public Table Remove;
+        public Table? Add;
+        public Table? Remove;
     }
 
     public sealed class Table
@@ -45,7 +45,6 @@ namespace RelEcs
             var i = 0;
             foreach (var type in types)
             {
-                if (type.IsTag) continue;
                 _indices.Add(type, i++);
             }
 
@@ -114,7 +113,6 @@ namespace RelEcs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Array GetStorage(StorageType type)
         {
-            if (type.IsTag) throw new Exception($"Cannot get Storage of Tag Component {type}");
             return _storages[_indices[type]];
         }
 

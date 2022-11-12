@@ -37,11 +37,20 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Entity left, Entity right) => left is not null && left.Equals(right);
+        public static bool operator ==(Entity? left, Entity? right)
+        {
+            if (left is null && right is null) return true;
+            if (left != null && right != null) return left.Equals(right);
+            return false;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Entity left, Entity right) =>
-            (left is null && right is not null) || (left is not null && !left.Equals(right));
+        public static bool operator !=(Entity? left, Entity? right)
+        {
+            if (left is null && right is null) return false;
+            if (left != null && right != null) return !left.Equals(right);
+            return true;
+        }
     }
 
     public readonly struct EntityBuilder
@@ -57,14 +66,14 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public EntityBuilder Add<T>(Entity target = default) where T : class
+        public EntityBuilder Add<T>(Entity? target = default) where T : class, new()
         {
             World.AddComponent<T>(_entity, target ?? Entity.None);
             return this;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public EntityBuilder Add<T>(Type type) where T : class
+        public EntityBuilder Add<T>(Type type) where T : class, new()
         {
             var typeEntity = World.GetTypeEntity(type);
             World.AddComponent<T>(_entity, typeEntity);

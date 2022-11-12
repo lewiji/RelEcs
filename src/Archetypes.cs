@@ -93,7 +93,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void AddComponent(StorageType type, Identity identity, object data = default)
+        public void AddComponent(StorageType type, Identity identity, object data)
         {
             ref var meta = ref Meta[identity.Id];
             var oldTable = Tables[meta.TableId];
@@ -128,8 +128,6 @@ namespace RelEcs
 
             meta.Row = newRow;
             meta.TableId = newTable.Id;
-
-            if (type.IsTag) return;
 
             var storage = newTable.GetStorage(type);
             storage.SetValue(data, newRow);
@@ -334,28 +332,21 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal (StorageType, object)[] GetComponents(Identity identity)
+        internal (StorageType, object?)[] GetComponents(Identity identity)
         {
             var meta = Meta[identity.Id];
             var table = Tables[meta.TableId];
 
-            var list = ListPool<(StorageType, object)>.Get();
+            var list = ListPool<(StorageType, object?)>.Get();
 
             foreach (var type in table.Types)
             {
-                if (type.IsTag)
-                {
-                    list.Add((type, null));
-                }
-                else
-                {
-                    var storage = table.GetStorage(type);
-                    list.Add((type, storage.GetValue(meta.Row)));
-                }
+                var storage = table.GetStorage(type);
+                list.Add((type, storage.GetValue(meta.Row)));
             }
 
             var array = list.ToArray();
-            ListPool<(StorageType, object)>.Add(list);
+            ListPool<(StorageType, object?)>.Add(list);
             return array;
         }
 

@@ -8,7 +8,6 @@ namespace RelEcs
     {
         public Type Type { get; private set; }
         public ulong Value { get; private set; }
-        public bool IsTag { get; private set; }
         public bool IsRelation { get; private set; }
 
         public ushort TypeId
@@ -30,7 +29,6 @@ namespace RelEcs
             {
                 Value = TypeIdConverter.Value<T>(identity),
                 Type = typeof(T),
-                IsTag = TypeIdConverter.IsTag<T>(),
                 IsRelation = identity.Id > 0,
             };
         }
