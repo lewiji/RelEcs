@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace RelEcs
@@ -64,7 +65,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetComponent<T>(Entity entity, out T? component) where T : class
+        public bool TryGetComponent<T>(Entity entity, [NotNullWhen(returnValue: true)] out T? component) where T : class
         {
             var type = StorageType.Create<T>(Identity.None);
             if (!HasComponent<T>(entity))
@@ -182,7 +183,7 @@ namespace RelEcs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetElement<T>(out T? element) where T : class
+        public bool TryGetElement<T>([NotNullWhen(returnValue: true)] out T? element) where T : class
         {
             var type = StorageType.Create<T>(Identity.None);
             if (!HasElement<T>())
